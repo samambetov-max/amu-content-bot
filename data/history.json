@@ -1,3 +1,13 @@
 {
-  "posts": []
+  "posts": [
+    {
+      "id": "20261101-2343-6064",
+      "created_at": "2026-11-01T23:43:31.521473+05:00",
+      "published_at": null,
+      "status": "replaced",
+      "topic": "Код ТН ВЭД и документы для растаможки груза из Китая: как не ошибиться в первый раз",
+      "content_type": "customs_faq",
+      "format": "carousel"
+    }
+  ]
 }
