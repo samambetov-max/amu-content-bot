@@ -33,14 +33,38 @@ def _pexels(query: str, api_key: str) -> list[StockPhoto]:
             for p in r.json().get("photos", []) if p.get("width", 0) >= MIN_WIDTH]
 
 
+# Tags that make a cover look fake or out of place for the audience
+BANNED_TAGS = {"toy", "model", "miniature", "lego", "military", "army", "tank", "weapon", "war", "alcohol", "beer",
+               "wine", "pork", "pig", "bikini", "cartoon", "illustration", "3d", "render"}
+
+
+def _clean(tags: str) -> bool:
+    return not ({t.strip().lower() for t in tags.split(",")} & BANNED_TAGS)
+
+
+def relevance(query: str, tags: str) -> int:
+    """How many query words the photo's tags contain. Words match by stem: "containers" fits "container",
+    "shipping" fits "ship"."""
+    words = [w for w in query.lower().split() if len(w) > 2]
+    tag_words = {w for t in tags.lower().split(",") for w in t.split()}
+    return sum(any(t.startswith(w[:5]) or (len(t) >= 4 and w.startswith(t)) for t in tag_words) for w in words)
+
+
 def _pixabay(query: str, api_key: str) -> list[StockPhoto]:
-    r = requests.get(PIXABAY_URL, params={"key": api_key, "q": query, "image_type": "photo", "orientation": "vertical",
-                                          "per_page": 30, "safesearch": "true", "min_width": MIN_WIDTH},
-                     headers=UA, timeout=30)
-    r.raise_for_status()
+    """Editors' choice first (real photography, not hobby shots), only photos whose tags match the query."""
+    need = min(2, len([w for w in query.split() if len(w) > 2])) or 1
+    base = {"key": api_key, "q": query, "image_type": "photo", "safesearch": "true", "per_page": 100, "order": "popular"}
+    ranked = []
+    for extra in ({"editors_choice": "true"}, {}):
+        r = requests.get(PIXABAY_URL, params={**base, **extra}, headers=UA, timeout=30)
+        r.raise_for_status()
+        hits = [h for h in r.json().get("hits", []) if _clean(h.get("tags", "")) and relevance(query, h.get("tags", "")) >= need]
+        # Most relevant first; portrait photos fit the 4:5 card without heavy cropping
+        ranked = sorted(hits, key=lambda h: (-relevance(query, h["tags"]), h.get("imageHeight", 0) < h.get("imageWidth", 0)))
+        if len(ranked) >= 3:
+            break
     # Pixabay forbids hotlinking: the photo is downloaded once and rendered into our own image.
-    return [StockPhoto(f"pixabay:{p['id']}", p["largeImageURL"], f"{p.get('user', '')} / Pixabay")
-            for p in r.json().get("hits", [])]
+    return [StockPhoto(f"pixabay:{h['id']}", h["largeImageURL"], f"{h.get('user', '')} / Pixabay") for h in ranked[:8]]
 
 
 def _openverse(query: str) -> list[StockPhoto]:

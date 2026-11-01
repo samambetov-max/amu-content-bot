@@ -73,6 +73,29 @@ def test_choose_photo_falls_back_to_own(monkeypatch, tmp_path):
 
 
 def test_pixabay_first_when_key(monkeypatch):
-    hits = {"hits": [{"id": 7, "largeImageURL": "https://x/7.jpg", "user": "C"}]}
+    hits = {"hits": [{"id": 7, "largeImageURL": "https://x/7.jpg", "user": "C", "tags": "truck, road"}]}
     monkeypatch.setattr(stock.requests, "get", lambda url, **kw: Resp(hits if "pixabay" in url else PEXELS))
     assert stock.find("truck", [], random.Random(1), pexels_key="k", pixabay_key="p").key == "pixabay:7"
+
+
+def test_pixabay_drops_toys_and_off_topic(monkeypatch):
+    calls = []
+
+    def get(url, params=None, **kw):
+        calls.append(params)
+        hits = [{"id": 1, "largeImageURL": "https://x/toy.jpg", "tags": "truck, toy, highway"},
+                {"id": 2, "largeImageURL": "https://x/milk.jpg", "tags": "milk can, flower"},
+                {"id": 3, "largeImageURL": "https://x/cat.jpg", "tags": "cat, warehouse"}]
+        if len(calls) == 2:
+            hits = [{"id": i, "largeImageURL": f"https://x/{i}.jpg", "tags": "trucks, highway, road"} for i in range(10, 14)]
+        return Resp({"hits": hits})
+
+    monkeypatch.setattr(stock.requests, "get", get)
+    photos = stock._pixabay("cargo truck highway", "k")
+    assert [p.key for p in photos] == [f"pixabay:{i}" for i in range(10, 14)]
+    assert calls[0]["editors_choice"] == "true" and "editors_choice" not in calls[1]
+
+
+def test_relevance_counts_query_words():
+    assert stock.relevance("shipping containers port", "container ship, port, logistics") == 3
+    assert stock.relevance("shipping containers port", "milk can, flower") == 0
