@@ -44,7 +44,7 @@ def build_prompt(brand: dict, strategy: dict, history: dict, content_type: str, 
     card_langs = brand.get("card_languages", langs)
     # One language leaves room for fuller texts on the cards and in the caption
     caption_len, slide_len = ("600–1000", 260) if len(langs) == 1 else ("350–700", 170)
-    caption_fields = ",\n".join(f'  "caption_{l}": "текст поста на языке {l}: {caption_len} символов, без хэштегов и контактов"' for l in langs)
+    caption_fields = ",\n".join(f'  "caption_{l}": "текст поста на языке {l}: {caption_len} символов, без хэштегов, контактов и финального призыва написать или позвонить (бот добавит его сам)"' for l in langs)
     slide_fields = ", ".join(f'"title_{l}": "до 60 символов", "text_{l}": "до {slide_len if len(card_langs) == 1 else 170} символов"' for l in card_langs)
     news_block = "\n".join(f"- {h}" for h in headlines) or "- (лента пуста — найди свежие новости поиском)"
     return f"""Сегодня {now:%d.%m.%Y}, {now:%A}.
