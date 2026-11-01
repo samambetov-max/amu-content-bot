@@ -1,0 +1,140 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600&display=block&subset=cyrillic,latin-ext" rel="stylesheet">
+<style>
+  /* DejaVu covers every Karakalpak letter if a web font lacks a glyph or Google Fonts is unreachable */
+  @font-face { font-family: "DejaVu"; src: url("{{ASSETS}}/fonts/DejaVuSans.ttf"); font-weight: 400 600; }
+  @font-face { font-family: "DejaVu"; src: url("{{ASSETS}}/fonts/DejaVuSans-Bold.ttf"); font-weight: 700 900; }
+  :root {
+    --navy: #0B1E4A; --navy-2: #102A63; --blue: #1D4DB5; --accent: #F6A623;
+    --ink: #0E1A33; --muted: #5A6787; --tint: #F3F6FC;
+    --head: "Montserrat", "DejaVu", sans-serif; --body: "Inter", "DejaVu", sans-serif;
+    --s: 1;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body, #root { width: var(--w); height: var(--h); overflow: hidden; }
+  body { font-family: var(--body); color: #fff; background: var(--navy); -webkit-font-smoothing: antialiased; }
+  .slide { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; padding: 84px 80px 72px; }
+  /* Reels: Instagram covers the top bar and the bottom ~20% with its own buttons and caption */
+  .tall .slide { padding: 200px 80px 380px; }
+  .bg { position: absolute; inset: 0; z-index: 0; }
+  .bg img { width: 100%; height: 100%; object-fit: cover; }
+  .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,30,74,.10) 0%, rgba(11,30,74,.45) 38%, rgba(11,30,74,.93) 66%, #0B1E4A 100%); }
+  .glow { position: absolute; inset: 0; background:
+      radial-gradient(900px 700px at 100% 0%, rgba(29,77,181,.55), transparent 60%),
+      radial-gradient(700px 600px at 0% 100%, rgba(246,166,35,.10), transparent 60%); }
+  .grid { position: absolute; inset: 0; opacity: .07;
+      background-image: linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px);
+      background-size: 72px 72px; }
+  .top, .body, .foot { position: relative; z-index: 1; }
+  .top { display: flex; justify-content: space-between; align-items: center; }
+  .chip { display: inline-block; padding: 14px 26px; border-radius: 999px; background: var(--accent); color: var(--navy);
+          font: 800 26px/1 var(--head); letter-spacing: .06em; text-transform: uppercase; }
+  .count { font: 700 28px/1 var(--head); opacity: .7; }
+  .body { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; padding: 32px 0 8px; }
+  .idx { font: 900 calc(150px * var(--s))/1 var(--head); color: var(--accent); margin-bottom: 28px; }
+  .big { font: 900 calc(230px * var(--s))/.95 var(--head); color: var(--blue); letter-spacing: -.03em; margin-bottom: 28px; white-space: nowrap; overflow: hidden; }
+  h1 { font: 800 calc(84px * var(--s))/1.08 var(--head); letter-spacing: -.015em; text-wrap: balance; }
+  h2 { font: 800 calc(64px * var(--s))/1.1 var(--head); letter-spacing: -.01em; text-wrap: balance; }
+  p { font: 400 calc(36px * var(--s))/1.42 var(--body); margin-top: calc(22px * var(--s)); text-wrap: pretty; opacity: .92; }
+  .alt { margin-top: calc(40px * var(--s)); padding-top: calc(34px * var(--s)); border-top: 3px solid rgba(255,255,255,.18); }
+  .alt h2, .alt h1 { font-size: calc(44px * var(--s)); font-weight: 700; opacity: .78; }
+  .alt p { font-size: calc(30px * var(--s)); opacity: .7; }
+  .cover .alt { border-top-color: var(--accent); }
+  .foot { display: flex; align-items: center; justify-content: space-between; margin-top: 36px; }
+  .brand { display: flex; align-items: center; gap: 18px; font: 800 30px/1 var(--head); }
+  .brand img { width: 62px; height: 62px; }
+  .brand small { display: block; font: 500 22px/1 var(--body); opacity: .65; margin-top: 8px; }
+  .swipe { font: 700 26px/1 var(--head); color: var(--accent); }
+
+  .fact { background: var(--tint); color: var(--ink); }
+  .fact .grid { opacity: .5; background-image: linear-gradient(rgba(29,77,181,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(29,77,181,.08) 1px, transparent 1px); }
+  .fact .alt { border-top-color: rgba(14,26,51,.15); }
+  .fact .count { color: var(--muted); }
+
+  .qa .q { font: 900 calc(190px * var(--s))/1 var(--head); color: var(--accent); margin-bottom: 8px; }
+  .qa .answer { background: #fff; color: var(--ink); border-radius: 28px; padding: calc(36px * var(--s)) calc(40px * var(--s)); margin-top: calc(36px * var(--s)); }
+  .qa .answer p { margin-top: 0; opacity: 1; }
+  .qa .answer p + p { margin-top: calc(18px * var(--s)); color: var(--muted); font-size: calc(30px * var(--s)); }
+
+  .cta { background: var(--accent); color: var(--navy); }
+  .cta .chip { background: var(--navy); color: #fff; }
+  .cta .alt { border-top-color: rgba(11,30,74,.25); }
+  .cta .phone { margin-top: calc(44px * var(--s)); font: 900 calc(70px * var(--s))/1 var(--head); letter-spacing: -.01em; }
+  .cta .handles { margin-top: 18px; font: 600 calc(32px * var(--s))/1.4 var(--body); }
+  .cta .swipe { display: none; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const D = /*DATA*/;
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+document.documentElement.style.setProperty("--w", D.width + "px");
+document.documentElement.style.setProperty("--h", D.height + "px");
+document.documentElement.classList.toggle("tall", D.height > 1500);
+
+const s = D.slide, langs = D.langs, kind = s.kind || "point";
+const t = (l) => s["title_" + l], x = (l) => s["text_" + l];
+const textBlock = (l, i, head) => {
+  const title = t(l) ? `<${head}>${esc(t(l))}</${head}>` : "";
+  const text = x(l) ? `<p>${esc(x(l))}</p>` : "";
+  return i === 0 ? title + text : `<div class="alt">${title}${text}</div>`;
+};
+const label = D.labels.map(esc).join(" · ");
+
+let bg = '<div class="bg"><div class="glow"></div><div class="grid"></div></div>';
+let body = "";
+if (kind === "cover") {
+  bg = `<div class="bg"><img src="${D.photo}"><div class="shade"></div></div>`;
+  body = langs.map((l, i) => textBlock(l, i, "h1")).join("");
+} else if (kind === "fact") {
+  bg = '<div class="bg"><div class="grid"></div></div>';
+  body = (s.big ? `<div class="big">${esc(s.big)}</div>` : "") + langs.map((l, i) => textBlock(l, i, "h2")).join("");
+} else if (kind === "qa") {
+  const answers = langs.map((l) => x(l) ? `<p>${esc(x(l))}</p>` : "").join("");
+  body = `<div class="q">?</div>` + langs.map((l, i) => i === 0 ? `<h2>${esc(t(l))}</h2>` : `<div class="alt"><h2>${esc(t(l))}</h2></div>`).join("")
+       + `<div class="answer">${answers}</div>`;
+} else if (kind === "cta") {
+  bg = "";
+  body = langs.map((l, i) => textBlock(l, i, "h2")).join("")
+       + `<div class="phone">${esc(D.contacts.phone)}</div>`
+       + `<div class="handles">${[D.contacts.telegram_bot, D.contacts.telegram_channel, D.contacts.site].filter(Boolean).map(esc).join(" · ")}</div>`;
+} else {
+  body = `<div class="idx">${String(D.index).padStart(2, "0")}</div>` + langs.map((l, i) => textBlock(l, i, "h2")).join("");
+}
+
+const isLast = D.index === D.total;
+document.getElementById("root").innerHTML = `
+  <div class="slide ${kind}">
+    ${bg}
+    <div class="top"><span class="chip">${label}</span>${D.total > 1 ? `<span class="count">${D.index}/${D.total}</span>` : ""}</div>
+    <div class="body" id="body">${body}</div>
+    <div class="foot">
+      <div class="brand"><img src="${D.assets}/logo-mark.svg"><div>AMU Logistics<small>${esc(D.contacts.telegram_channel || "")}</small></div></div>
+      ${D.total > 1 && !isLast && D.swipe ? `<span class="swipe">${esc(D.swipe)} →</span>` : ""}
+    </div>
+  </div>`;
+
+/* Shrink the type until everything fits: long Karakalpak words must never be cut off */
+window.fit = async () => {
+  await document.fonts.ready;
+  const box = document.getElementById("body");
+  /* A big number or date stays on one line: shrink it on its own until it fits the width */
+  const big = document.querySelector(".big");
+  for (let px = 230; big && big.scrollWidth > big.clientWidth + 1 && px > 80; px -= 10) big.style.fontSize = px + "px";
+  let scale = 1;
+  while (box.scrollHeight > box.clientHeight + 1 && scale > 0.45) {
+    scale -= 0.03;
+    document.documentElement.style.setProperty("--s", scale.toFixed(2));
+  }
+  const imgs = [...document.images].map((im) => im.complete ? null : new Promise((r) => { im.onload = im.onerror = r; }));
+  await Promise.all(imgs.filter(Boolean));
+  return scale;
+};
+</script>
+</body>
+</html>

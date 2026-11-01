@@ -1,0 +1,18 @@
+{
+  "topic": "Из чего складываются таможенные платежи при импорте",
+  "content_type": "customs_faq",
+  "format": "carousel",
+  "caption_ru": "Сколько на самом деле стоит растаможка? 🤔\n\nМногие считают только пошлину — и потом удивляются итоговой сумме. Разберём по шагам.",
+  "caption_kaa": "Bajıxana tólemleri haqıyqatında qansha turadı? 🤔\n\nKópshilik tek bajını esaplaydı — keyin jámi summaǵa hayran qaladı. Basqıshpa-basqısh kórip shıǵamız.",
+  "hashtags": ["#таможня", "#импорт", "#пошлина"],
+  "photo_tag": "container",
+  "slides": [
+    {"kind": "cover", "title_ru": "Из чего складывается растаможка товара из Китая", "text_ru": "3 платежа, о которых нужно знать заранее", "title_kaa": "Qıtaydan tovardı bajıxanadan ótkeriw neden ibarat", "text_kaa": "Aldınnan biliw kerek bolǵan 3 tólem"},
+    {"kind": "point", "title_ru": "Таможенная пошлина", "text_ru": "Ставка зависит от кода ТН ВЭД: от 0 до 30% и выше. Считается от таможенной стоимости.", "title_kaa": "Bajıxana bajı", "text_kaa": "Stavka TN VED kodına baylanıslı: 0 den 30% ke shekem hám onnan joqarı."},
+    {"kind": "fact", "big": "12%", "title_ru": "НДС при импорте", "text_ru": "Начисляется на сумму стоимости товара и пошлины.", "title_kaa": "Importta QQS", "text_kaa": "Tovar bahası hám bajı summasına esaplanadı."},
+    {"kind": "qa", "title_ru": "Можно ли узнать сумму до отправки?", "text_ru": "Да. По коду ТН ВЭД и инвойсу мы заранее рассчитаем все платежи.", "title_kaa": "Summanı jiberiwden aldın biliwge bola ma?", "text_kaa": "Awa. TN VED kodı hám invoys boyınsha barlıq tólemlerdi aldınnan esaplaymız."},
+    {"kind": "cta", "title_ru": "Рассчитаем вашу растаможку бесплатно", "text_ru": "Пришлите инвойс или название товара", "title_kaa": "Bajıxana tólemlerin biypul esaplaymız", "text_kaa": "Invoys yamasa tovar atın jiberiń"}
+  ],
+  "sources": ["lex.uz"],
+  "needs_fact_check": true
+}

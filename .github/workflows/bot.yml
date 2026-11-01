@@ -1,0 +1,57 @@
+name: content-bot
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # every 15 minutes; the bot itself decides whether to do anything
+  workflow_dispatch:
+
+# Never two runs at once: they would both read and write data/*.json
+concurrency:
+  group: content-bot
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: |
+          pip install -r requirements.txt
+          npm install -g @anthropic-ai/claude-code
+
+      - name: Git identity
+        run: |
+          git config user.name "amu-content-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Run
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_ADMIN_ID: ${{ secrets.TG_ADMIN_ID }}
+          TG_CHANNEL: ${{ secrets.TG_CHANNEL }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python -m bot tick
+
+      - name: Save bot memory
+        if: always()
+        run: |
+          git add data
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "bot: update state"
+          for i in 1 2 3; do git pull --rebase -X theirs origin "${GITHUB_REF_NAME}" && git push && exit 0; sleep 5; done
+          exit 1
