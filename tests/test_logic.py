@@ -10,7 +10,7 @@ from bot import admin, captions, learn, llm, news, planner, video, writer
 from bot.config import load_brand
 
 TZ = ZoneInfo("Asia/Tashkent")
-BRAND = load_brand()
+BRAND = {**load_brand(), "languages": ["ru", "kaa"], "card_languages": ["ru", "kaa"]}
 STRATEGY = json.loads((Path(__file__).parent.parent / "data" / "strategy.json").read_text(encoding="utf-8"))
 SAMPLE = json.loads((Path(__file__).parent / "fixtures" / "sample_post.json").read_text(encoding="utf-8"))
 
