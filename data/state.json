@@ -1,8 +1,10 @@
 {
-  "tg_offset": 0,
+  "tg_offset": 265328204,
   "paused": false,
   "pending": null,
   "awaiting_edit": null,
-  "last_metrics_at": null,
-  "last_learn_at": null
+  "last_metrics_at": "2026-11-01T23:39:24.476746+05:00",
+  "last_learn_at": "2026-11-01T23:39:24.476746+05:00",
+  "last_error_at": null,
+  "last_draft_at": null
 }

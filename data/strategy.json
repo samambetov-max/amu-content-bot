@@ -2,9 +2,24 @@
   "version": 1,
   "updated_at": null,
   "posts_per_week": 5,
-  "best_hours": [9, 13, 19],
-  "posting_days": [0, 1, 2, 3, 4, 5],
-  "format_weights": {"photo": 0.45, "carousel": 0.4, "reels": 0.15},
+  "best_hours": [
+    9,
+    13,
+    19
+  ],
+  "posting_days": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "format_weights": {
+    "photo": 0.45,
+    "carousel": 0.4,
+    "reels": 0.15
+  },
   "type_weights": {
     "customs_faq": 0.28,
     "law_update": 0.18,
