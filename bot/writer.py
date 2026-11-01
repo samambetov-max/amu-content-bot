@@ -76,12 +76,20 @@ def build_prompt(brand: dict, strategy: dict, history: dict, content_type: str, 
 }}"""
 
 
+def pick_type(strategy: dict, history: dict, now: datetime, holiday: str | None, rng: random.Random) -> str:
+    """The very first post greets the audience; then holidays first, otherwise the strategy's weights."""
+    if not any(p.get("published_at") for p in history.get("posts", [])):
+        return "welcome"
+    if holiday and not _greeted(history, now):
+        return "holiday"
+    return planner.pick_weighted(strategy["type_weights"], rng)
+
+
 def write_post(secrets: Secrets, brand: dict, strategy: dict, history: dict, now: datetime,
                rng: random.Random, wish: str = "", fmt: str | None = None, content_type: str | None = None) -> dict:
     holiday = planner.upcoming_holiday(now, brand.get("holidays", {}))
-    if not content_type:
-        content_type = "holiday" if holiday and not _greeted(history, now) else planner.pick_weighted(strategy["type_weights"], rng)
-    fmt = fmt or planner.pick_weighted(strategy["format_weights"], rng)
+    content_type = content_type or pick_type(strategy, history, now, holiday, rng)
+    fmt = fmt or ("carousel" if content_type == "welcome" else planner.pick_weighted(strategy["format_weights"], rng))
     headlines = news.fresh_headlines(brand, now)
     prompt = build_prompt(brand, strategy, history, content_type, fmt, headlines, holiday, now, wish)
     post, sources = llm.generate_json(secrets, brand, system_prompt(brand, strategy), prompt,

@@ -23,6 +23,7 @@ LABELS = {
     "news_hype": {"ru": "Новости", "kaa": "Jańalıqlar"},
     "company_service": {"ru": "AMU Logistics", "kaa": "AMU Logistics"},
     "holiday": {"ru": "Праздник", "kaa": "Bayram"},
+    "welcome": {"ru": "Добро пожаловать", "kaa": "Xosh keldińiz"},
 }
 SWIPE = {"ru": "Листайте", "kaa": "Aylandırıń", "uz": "Varaqlang"}
 

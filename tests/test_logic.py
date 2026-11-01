@@ -224,3 +224,11 @@ def test_reel_command_chains_crossfades():
     assert graph.count("xfade") == 3
     assert "anullsrc" in " ".join(cmd)
     assert video.total_seconds(4) == pytest.approx(16.5)
+
+
+def test_first_post_is_welcome_then_strategy():
+    rng = random.Random(1)
+    assert writer.pick_type(STRATEGY, {"posts": [{"status": "rejected"}]}, at(2, 9), None, rng) == "welcome"
+    published = {"posts": [{"published_at": at(1, 9).isoformat()}]}
+    assert writer.pick_type(STRATEGY, published, at(2, 9), None, rng) in STRATEGY["type_weights"]
+    assert writer.pick_type(STRATEGY, published, at(2, 9), "Навруз (завтра)", rng) == "holiday"
