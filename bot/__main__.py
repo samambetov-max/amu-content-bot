@@ -9,14 +9,16 @@ import logging
 import random
 from datetime import datetime
 
-from . import captions, render, storage, tick, video, writer
+from . import captions, pipeline, render, storage, tick, video, writer
 from .config import OUT_DIR, ROOT, load_brand, load_secrets, tz
 
 
 def render_local(post: dict, brand: dict, folder: str) -> None:
     rng = random.Random()
-    photo = render.pick_photo(post.get("photo_tag", ""), [], rng)
     out = OUT_DIR / folder
+    ctx = pipeline.Ctx(brand, load_secrets(), {}, {}, {"posts": []}, rng)
+    photo, photo_key = pipeline.choose_photo(ctx, post, out)
+    print(f"Фото: {photo_key}")
     if post["format"] == "reels":
         frames = render.render_slides(post, brand, out, "story", photo)
         video.make_reel(frames, out / "reel.mp4", rng)

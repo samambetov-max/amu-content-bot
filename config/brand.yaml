@@ -38,6 +38,10 @@ timezone: Asia/Tashkent
 approval_mode: auto_after_timeout
 approval_timeout_hours: 2
 
+# Фото на обложках: доля бесплатных стоковых фото (Pexels, Openverse CC0) по теме поста, остальное — ваши фото
+# из assets/photos. 0 — только ваши фото, 1 — только стоки (ваши остаются запасными).
+stock_photo_share: 0.6
+
 # Площадки: можно временно выключить
 platforms:
   telegram: true

@@ -6,7 +6,7 @@ from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from . import captions, instagram, media_store, render, telegram, video, writer
+from . import captions, instagram, media_store, render, stock, telegram, video, writer
 from .config import MEDIA_DIR, OUT_DIR, Secrets
 
 log = logging.getLogger(__name__)
@@ -35,17 +35,30 @@ def new_id(now: datetime) -> str:
     return f"{now:%Y%m%d-%H%M}-{pysecrets.token_hex(2)}"
 
 
-def render_media(ctx: Ctx, post: dict, post_id: str) -> dict:
+def choose_photo(ctx: Ctx, post: dict, work: Path) -> tuple[Path, str]:
+    """Cover photo: a free stock photo for the topic (share set in brand.yaml) or one of the company's own photos.
+    Returns the file and the key remembered in history so photos do not repeat."""
     used = [p.get("photo", "") for p in ctx.history.get("posts", [])]
-    photo = render.pick_photo(post.get("photo_tag", ""), used, ctx.rng)
+    query = str(post.get("photo_query", "")).strip()
+    if query and ctx.rng.random() < ctx.brand.get("stock_photo_share", 0.6):
+        found = stock.find(query, used, ctx.rng, ctx.secrets.pexels_key)
+        path = stock.download(found, work / "stock.jpg") if found else None
+        if path:
+            return path, found.key
+    own = render.pick_photo(post.get("photo_tag", ""), used, ctx.rng)
+    return own, own.name
+
+
+def render_media(ctx: Ctx, post: dict, post_id: str) -> dict:
     work = OUT_DIR / post_id
+    photo, photo_key = choose_photo(ctx, post, work)
     if post["format"] == "reels":
         frames = render.render_slides(post, ctx.brand, work, "story", photo)
         files = [video.make_reel(frames, work / "reel.mp4", ctx.rng)]
     else:
         files = render.render_slides(post, ctx.brand, work, "feed", photo)
     stored = media_store.store(post_id, files)
-    return {"files": [f.relative_to(MEDIA_DIR).as_posix() for f in stored], "photo": photo.name}
+    return {"files": [f.relative_to(MEDIA_DIR).as_posix() for f in stored], "photo": photo_key}
 
 
 def make_draft(ctx: Ctx, now: datetime, publish_at: datetime, wish: str = "",

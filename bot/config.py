@@ -29,6 +29,7 @@ class Secrets:
     ig_token: str
     media_base_url: str
     claude_oauth_token: str = ""
+    pexels_key: str = ""
 
     @property
     def instagram_ready(self) -> bool:
@@ -59,6 +60,7 @@ def load_secrets() -> Secrets:
         ig_token=env("IG_ACCESS_TOKEN", ""),
         media_base_url=_pages_url(),
         claude_oauth_token=env("CLAUDE_CODE_OAUTH_TOKEN", ""),
+        pexels_key=env("PEXELS_API_KEY", ""),
     )
 
 
