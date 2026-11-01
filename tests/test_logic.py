@@ -238,3 +238,8 @@ def test_welcome_prompt_ignores_earlier_drafts():
     history = {"posts": [{"topic": "Добро пожаловать в AMU Logistics", "status": "replaced"}]}
     prompt = writer.build_prompt(BRAND, STRATEGY, history, "welcome", "carousel", [], None, at(2, 9))
     assert "Добро пожаловать в AMU Logistics" not in prompt
+
+
+def test_telegram_caption_is_clean():
+    text = captions.build(SAMPLE, BRAND, "telegram")
+    assert "#" not in text and "Instagram" not in text and "+86 193 2064 5050" in text

@@ -19,8 +19,6 @@ def contacts_line(brand: dict, platform: str) -> str:
         parts.append(f"🤖 {c['telegram_bot']}")
     if platform == "instagram" and c.get("telegram_channel"):
         parts.append(f"✈️ Telegram: {c['telegram_channel']}")
-    if platform == "telegram" and c.get("instagram"):
-        parts.append(f"📸 Instagram: {c['instagram']}")
     if c.get("site"):
         parts.append(f"🌐 {c['site']}")
     return "\n".join(parts)
@@ -52,7 +50,7 @@ def build(post: dict, brand: dict, platform: str) -> str:
     tail = "\n\n".join(filter(None, [
         "\n".join(CTA.get(l, "") for l in langs if CTA.get(l)),
         contacts_line(brand, platform),
-        hashtags(post, brand),
+        hashtags(post, brand) if platform == "instagram" else "",  # hashtags only help discovery on Instagram
     ]))
     budget = (limit - len(tail) - 2 - (len(SEPARATOR) + 4) * (len(langs) - 1)) // len(langs)
     bodies = [_trim(str(post[f"caption_{l}"]).strip(), budget) for l in langs]
