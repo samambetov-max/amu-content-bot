@@ -79,7 +79,7 @@ def test_upcoming_holiday():
 def test_caption_has_both_languages_contacts_and_hashtags():
     text = captions.build(SAMPLE, BRAND, "instagram")
     assert SAMPLE["caption_ru"] in text and SAMPLE["caption_kaa"] in text
-    assert "+998 33 150 88 88" in text and "Telegram: @amulogistics" in text
+    assert "+86 193 2064 5050" in text and "+998 33 150 88 88 (Узбекистан)" in text and "Telegram: @amulogistics" in text
     assert "#amulogistics" in text and "#пошлина" in text
 
 

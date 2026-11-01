@@ -14,7 +14,7 @@ CTA = {
 
 def contacts_line(brand: dict, platform: str) -> str:
     c = brand["company"]["contacts"]
-    parts = [f"📞 {c['phone']}"]
+    parts = [f"📞 {c['phone']}"] + ([f"📞 {c['phone_uz']} (Узбекистан)"] if c.get("phone_uz") else [])
     if c.get("telegram_bot"):
         parts.append(f"🤖 {c['telegram_bot']}")
     if platform == "instagram" and c.get("telegram_channel"):
