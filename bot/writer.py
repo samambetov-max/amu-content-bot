@@ -18,7 +18,7 @@ def system_prompt(brand: dict, strategy: dict) -> str:
     rules = "\n".join(f"- {r}" for r in brand.get("tone_rules", []))
     style = "\n".join(f"- {s}" for s in strategy.get("style_notes", []) + strategy.get("learnings", []))
     admin = "\n".join(f"- {r}" for r in strategy.get("admin_rules", [])) or "- (нет)"
-    return f"""Ты — SMM-редактор и таможенный брокер компании {c['name']} ({c['city']}, с {c['since']} года).
+    return f"""Ты — SMM-редактор и таможенный брокер компании {c['name']} (возит грузы из Китая с {c['since']} года, клиентов: {c.get('clients', '—')}).
 Ведёшь Telegram-канал и Instagram компании.
 
 О компании: {c['description']}

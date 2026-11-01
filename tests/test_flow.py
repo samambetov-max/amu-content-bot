@@ -208,3 +208,14 @@ def test_status_and_settings_commands(env):
                    {"update_id": 3, "message": {"from": {"id": 7}, "text": "/pause"}}]
     ctx = tick.process_updates(make_ctx(), at(2, 15))
     assert "Работаю" in tg.texts() and ctx.strategy["posts_per_week"] == 3 and not ctx.state["paused"]
+
+
+def test_redo_rebuilds_same_type_and_format(env):
+    tg, calls = env
+    ctx = step(make_ctx(), at(2, 7))
+    old = ctx.state["pending"]
+    tg.updates.append({"update_id": 1, "message": {"from": {"id": 42}, "text": "/redo про ЖД"}})
+    ctx = step(ctx, at(2, 7, 15))
+    new = ctx.state["pending"]
+    assert new["id"] != old["id"] and new["post"]["format"] == old["post"]["format"]
+    assert "про ЖД" in new["post"]["topic"] and ctx.history["posts"][-1]["status"] == "replaced"
