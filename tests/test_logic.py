@@ -232,3 +232,9 @@ def test_first_post_is_welcome_then_strategy():
     published = {"posts": [{"published_at": at(1, 9).isoformat()}]}
     assert writer.pick_type(STRATEGY, published, at(2, 9), None, rng) in STRATEGY["type_weights"]
     assert writer.pick_type(STRATEGY, published, at(2, 9), "Навруз (завтра)", rng) == "holiday"
+
+
+def test_welcome_prompt_ignores_earlier_drafts():
+    history = {"posts": [{"topic": "Добро пожаловать в AMU Logistics", "status": "replaced"}]}
+    prompt = writer.build_prompt(BRAND, STRATEGY, history, "welcome", "carousel", [], None, at(2, 9))
+    assert "Добро пожаловать в AMU Logistics" not in prompt

@@ -39,7 +39,8 @@ def system_prompt(brand: dict, strategy: dict) -> str:
 
 def build_prompt(brand: dict, strategy: dict, history: dict, content_type: str, fmt: str,
                  headlines: list[str], holiday: str | None, now: datetime, wish: str = "") -> str:
-    recent = [p.get("topic", "") for p in history.get("posts", [])[-30:]]
+    # The welcome post is one of a kind: earlier welcome drafts must not push it to another topic
+    recent = [] if content_type == "welcome" else [p.get("topic", "") for p in history.get("posts", [])[-30:]]
     langs = brand["languages"]
     card_langs = brand.get("card_languages", langs)
     # One language leaves room for fuller texts on the cards and in the caption
