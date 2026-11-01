@@ -1,4 +1,4 @@
-"""Free stock photos for covers: Pexels (free key, no attribution needed) with Openverse public-domain as a fallback.
+"""Free stock photos for covers: Pixabay or Pexels (free keys, no attribution needed), Openverse public domain as a fallback.
 
 Only sources whose license allows commercial use without credit: never images scraped from arbitrary sites.
 """
@@ -11,6 +11,7 @@ import requests
 
 log = logging.getLogger(__name__)
 PEXELS_URL = "https://api.pexels.com/v1/search"
+PIXABAY_URL = "https://pixabay.com/api/"
 OPENVERSE_URL = "https://api.openverse.org/v1/images/"
 MIN_WIDTH = 1080
 UA = {"User-Agent": "amu-content-bot (github.com/samambetov-max/amu-content-bot)"}
@@ -32,6 +33,16 @@ def _pexels(query: str, api_key: str) -> list[StockPhoto]:
             for p in r.json().get("photos", []) if p.get("width", 0) >= MIN_WIDTH]
 
 
+def _pixabay(query: str, api_key: str) -> list[StockPhoto]:
+    r = requests.get(PIXABAY_URL, params={"key": api_key, "q": query, "image_type": "photo", "orientation": "vertical",
+                                          "per_page": 30, "safesearch": "true", "min_width": MIN_WIDTH},
+                     headers=UA, timeout=30)
+    r.raise_for_status()
+    # Pixabay forbids hotlinking: the photo is downloaded once and rendered into our own image.
+    return [StockPhoto(f"pixabay:{p['id']}", p["largeImageURL"], f"{p.get('user', '')} / Pixabay")
+            for p in r.json().get("hits", [])]
+
+
 def _openverse(query: str) -> list[StockPhoto]:
     r = requests.get(OPENVERSE_URL, params={"q": query, "license": "cc0,pdm", "page_size": 30, "mature": "false"},
                      headers=UA, timeout=40)
@@ -40,9 +51,10 @@ def _openverse(query: str) -> list[StockPhoto]:
             for p in r.json().get("results", []) if (p.get("width") or 0) >= MIN_WIDTH]
 
 
-def find(query: str, used: list[str], rng: random.Random, pexels_key: str = "") -> StockPhoto | None:
+def find(query: str, used: list[str], rng: random.Random, pexels_key: str = "", pixabay_key: str = "") -> StockPhoto | None:
     """A fresh photo for the query, or None when no source answers."""
-    sources = ([lambda: _pexels(query, pexels_key)] if pexels_key else []) + [lambda: _openverse(query)]
+    sources = ([lambda: _pixabay(query, pixabay_key)] if pixabay_key else []) \
+        + ([lambda: _pexels(query, pexels_key)] if pexels_key else []) + [lambda: _openverse(query)]
     for source in sources:
         try:
             photos = [p for p in source() if p.key not in used]

@@ -41,7 +41,7 @@ def choose_photo(ctx: Ctx, post: dict, work: Path) -> tuple[Path, str]:
     used = [p.get("photo", "") for p in ctx.history.get("posts", [])]
     query = str(post.get("photo_query", "")).strip()
     if query and ctx.rng.random() < ctx.brand.get("stock_photo_share", 0.6):
-        found = stock.find(query, used, ctx.rng, ctx.secrets.pexels_key)
+        found = stock.find(query, used, ctx.rng, ctx.secrets.pexels_key, ctx.secrets.pixabay_key)
         path = stock.download(found, work / "stock.jpg") if found else None
         if path:
             return path, found.key

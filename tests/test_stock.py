@@ -70,3 +70,9 @@ def test_choose_photo_falls_back_to_own(monkeypatch, tmp_path):
     monkeypatch.setattr(stock.requests, "get", lambda url, **kw: Resp(status=503))
     _, key = pipeline.choose_photo(ctx(1), {"photo_query": "x"}, tmp_path)
     assert key.endswith(".jpg")
+
+
+def test_pixabay_first_when_key(monkeypatch):
+    hits = {"hits": [{"id": 7, "largeImageURL": "https://x/7.jpg", "user": "C"}]}
+    monkeypatch.setattr(stock.requests, "get", lambda url, **kw: Resp(hits if "pixabay" in url else PEXELS))
+    assert stock.find("truck", [], random.Random(1), pexels_key="k", pixabay_key="p").key == "pixabay:7"
