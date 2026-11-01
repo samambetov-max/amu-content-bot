@@ -60,6 +60,18 @@ def publish_slot(now: datetime, lead_hours: float) -> datetime:
     return slot.replace(minute=0, second=0, microsecond=0)
 
 
+def next_slot(earliest: datetime, strategy: dict) -> datetime:
+    """First posting hour on a posting day at or after `earliest` (a draft made at night waits for the morning)."""
+    slot = earliest.replace(minute=0, second=0, microsecond=0)
+    if slot < earliest:
+        slot += timedelta(hours=1)
+    for _ in range(24 * 8):
+        if slot.weekday() in strategy.get("posting_days", range(7)) and slot.hour in strategy.get("best_hours", []):
+            return slot
+        slot += timedelta(hours=1)
+    return earliest
+
+
 def upcoming_holiday(now: datetime, holidays: dict) -> str | None:
     for delta in (0, 1):
         day = now + timedelta(days=delta)

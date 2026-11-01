@@ -85,7 +85,7 @@ def handle_command(ctx: Ctx, intent: admin.Intent, now: datetime) -> Ctx:
             return ctx
         fmt, wish = admin.split_now_arg(intent.arg)
         notify(ctx, "⏳ Готовлю черновик, это займёт 1–3 минуты…")
-        return create_draft(ctx, now, now + lead_time(ctx.brand), wish=wish, fmt=fmt)
+        return create_draft(ctx, now, planner.next_slot(now + lead_time(ctx.brand), ctx.strategy), wish=wish, fmt=fmt)
     if name == "status":
         notify(ctx, status_text(ctx, now))
         return ctx

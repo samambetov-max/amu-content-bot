@@ -51,6 +51,12 @@ def test_publish_slot_is_on_the_hour():
     assert planner.publish_slot(at(2, 7, 14), 2) == at(2, 9)
 
 
+def test_next_slot_waits_for_morning_and_skips_sunday():
+    assert planner.next_slot(at(2, 1, 40), STRATEGY) == at(2, 9)
+    assert planner.next_slot(at(2, 13), STRATEGY) == at(2, 13)
+    assert planner.next_slot(at(7, 20), STRATEGY) == at(9, 9)  # Saturday evening -> Monday morning
+
+
 def test_pick_weighted_follows_weights():
     rng = random.Random(7)
     picks = [planner.pick_weighted({"a": 0.9, "b": 0.1}, rng, explore=0) for _ in range(2000)]
