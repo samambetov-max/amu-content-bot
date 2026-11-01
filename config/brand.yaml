@@ -43,6 +43,11 @@ approval_timeout_hours: 2
 # из assets/photos. 0 — только ваши фото, 1 — только стоки (ваши остаются запасными).
 stock_photo_share: 0.6
 
+# Кнопки под постами в Telegram-канале (ссылки). Удалите строки, чтобы убрать кнопку.
+telegram_buttons:
+  - text: "💬 Рассчитать доставку"
+    url: "https://t.me/+8619320645050"
+
 # Площадки: можно временно выключить
 platforms:
   telegram: true

@@ -108,7 +108,8 @@ def preview_text(ctx: Ctx, pending: dict) -> str:
 def send_preview(ctx: Ctx, pending: dict) -> dict:
     s = ctx.secrets
     caption = captions.build(pending["post"], ctx.brand, "telegram")
-    telegram.send_post(s.tg_token, s.tg_admin_id, pending["post"]["format"], media_paths(pending), caption)
+    telegram.send_post(s.tg_token, s.tg_admin_id, pending["post"]["format"], media_paths(pending), caption,
+                       markup=telegram.url_buttons(ctx.brand.get("telegram_buttons")))
     msg = telegram.send_text(s.tg_token, s.tg_admin_id, preview_text(ctx, pending), markup=keyboard(pending["id"]))
     return {**pending, "preview_msg_id": msg["message_id"]}
 
@@ -139,7 +140,8 @@ def publish(ctx: Ctx, pending: dict, now: datetime, approved_by: str) -> tuple[d
         try:
             ids = telegram.send_post(s.tg_token, s.tg_channel, post["format"], media_paths(pending),
                                      captions.build(post, ctx.brand, "telegram"),
-                                     first_image_url=urls[0] if live else None)
+                                     first_image_url=urls[0] if live else None,
+                                     markup=telegram.url_buttons(ctx.brand.get("telegram_buttons")))
             entry["tg_message_ids"] = ids
         except telegram.TelegramError as err:
             problems.append(f"Telegram: {err}")

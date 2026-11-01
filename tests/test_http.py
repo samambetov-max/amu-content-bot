@@ -141,3 +141,26 @@ def test_claude_code_limit_falls_back_to_gemini(monkeypatch):
 def test_no_ai_configured():
     with pytest.raises(llm.LLMError, match="no AI key"):
         llm.generate(Secrets("", "", "t", "42", "@c", "", "", ""), {"llm": {"provider": "gemini"}}, "s", "p")
+
+
+def test_buttons_ride_on_the_post(monkeypatch, tmp_path):
+    img = tmp_path / "a.jpg"
+    img.write_bytes(b"x")
+    calls = []
+
+    def post(url, data=None, files=None, timeout=None):
+        method = url.rsplit("/", 1)[-1]
+        calls.append((method, data))
+        result = [{"message_id": 1}, {"message_id": 2}] if method == "sendMediaGroup" else {"message_id": 3}
+        return Resp({"ok": True, "result": result})
+
+    monkeypatch.setattr(telegram.requests, "post", post)
+    markup = telegram.url_buttons([{"text": "Рассчитать", "url": "https://t.me/+86"}, {"text": "", "url": "x"}])
+    assert markup == {"inline_keyboard": [[{"text": "Рассчитать", "url": "https://t.me/+86"}]]}
+    telegram.send_post("t", "@c", "photo", [img], "short", markup=markup)
+    assert calls[0][0] == "sendPhoto" and "Рассчитать" in calls[0][1]["reply_markup"]
+    calls.clear()
+    telegram.send_post("t", "@c", "carousel", [img, img], "short", markup=markup)
+    assert [c[0] for c in calls] == ["sendMediaGroup", "sendMessage"]
+    assert "caption" not in calls[0][1]["media"] and "Рассчитать" in calls[1][1]["reply_markup"]
+    assert telegram.url_buttons([]) is None

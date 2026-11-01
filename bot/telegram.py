@@ -46,34 +46,46 @@ def send_text(token: str, chat_id: str, text: str, markup: dict | None = None, r
     return api(token, "sendMessage", data)
 
 
+def url_buttons(buttons: list[dict]) -> dict | None:
+    """Inline keyboard of link buttons from brand.yaml: [{text, url}], one per row."""
+    rows = [[{"text": b["text"], "url": b["url"]}] for b in buttons or [] if b.get("text") and b.get("url")]
+    return {"inline_keyboard": rows} if rows else None
+
+
 def send_post(token: str, chat_id: str, fmt: str, files: list[Path], caption: str,
-              first_image_url: str | None = None) -> list[int]:
-    """Posts media and text as one unit. Text longer than a caption allows goes in a message right after."""
+              first_image_url: str | None = None, markup: dict | None = None) -> list[int]:
+    """Posts media and text as one unit, with link buttons under it.
+    Text longer than a caption allows goes in a message right after. An album cannot carry buttons,
+    so a carousel with buttons is the album followed by its text with the buttons."""
     fits = len(caption) <= TG_CAPTION_LIMIT
+    text_apart = not fits or (fmt == "carousel" and markup)
     if fmt == "photo" and not fits and first_image_url:
         # A link preview puts the picture above a long text in a single message.
         try:
-            return [send_text(token, chat_id, caption, preview_url=first_image_url)["message_id"]]
+            return [send_text(token, chat_id, caption, markup=markup, preview_url=first_image_url)["message_id"]]
         except TelegramError as err:
             log.warning("preview post failed, sending photo + text: %s", err)
+    inline = None if text_apart else markup
     with ExitStack() as stack:
         handles = [stack.enter_context(open(f, "rb")) for f in files]
         if fmt == "reels":
-            sent = [api(token, "sendVideo", {"chat_id": chat_id, "caption": caption if fits else None,
-                                             "supports_streaming": True, "width": 1080, "height": 1920},
+            sent = [api(token, "sendVideo", {"chat_id": chat_id, "caption": None if text_apart else caption,
+                                             "supports_streaming": True, "width": 1080, "height": 1920,
+                                             "reply_markup": inline},
                         files={"video": handles[0]})]
         elif fmt == "photo":
-            sent = [api(token, "sendPhoto", {"chat_id": chat_id, "caption": caption if fits else None},
+            sent = [api(token, "sendPhoto", {"chat_id": chat_id, "caption": None if text_apart else caption,
+                                             "reply_markup": inline},
                         files={"photo": handles[0]})]
         else:
             media = [{"type": "photo", "media": f"attach://f{i}"} for i in range(len(handles))]
-            if fits:
+            if not text_apart:
                 media[0]["caption"] = caption
             sent = api(token, "sendMediaGroup", {"chat_id": chat_id, "media": media},
                        files={f"f{i}": h for i, h in enumerate(handles)})
     ids = [m["message_id"] for m in sent]
-    if not fits:
-        ids.append(send_text(token, chat_id, caption)["message_id"])
+    if text_apart:
+        ids.append(send_text(token, chat_id, caption, markup=markup)["message_id"])
     return ids
 
 

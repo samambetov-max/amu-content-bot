@@ -30,9 +30,9 @@ class FakeTelegram:
         self.sent.append({"chat": chat_id, "text": text, "markup": markup})
         return {"message_id": self.next_id}
 
-    def send_post(self, token, chat_id, fmt, files, caption, first_image_url=None):
+    def send_post(self, token, chat_id, fmt, files, caption, first_image_url=None, markup=None):
         self.next_id += 1
-        self.posts.append({"chat": chat_id, "fmt": fmt, "caption": caption})
+        self.posts.append({"chat": chat_id, "fmt": fmt, "caption": caption, "markup": markup})
         return [self.next_id]
 
     def answer_callback(self, *a, **k):
@@ -103,6 +103,7 @@ def test_draft_then_admin_approves(env):
     post = ctx.history["posts"][-1]
     assert post["approved_by"] == "admin" and post["ig_permalink"] == "https://ig/p/1"
     assert tg.posts[-1]["chat"] == "@chan" and "Опубликовано" in tg.texts()
+    assert "Рассчитать доставку" in str(tg.posts[-1]["markup"])
     assert calls["ig"][0][2] == "carousel"
 
 
