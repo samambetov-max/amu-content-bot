@@ -1,10 +1,110 @@
 {
-  "tg_offset": 265328204,
+  "tg_offset": 265328206,
   "paused": false,
-  "pending": null,
+  "pending": {
+    "id": "20261101-2343-6064",
+    "created_at": "2026-11-01T23:43:31.521473+05:00",
+    "publish_at": "2026-11-02T09:00:00+05:00",
+    "status": "waiting",
+    "post": {
+      "topic": "Код ТН ВЭД и документы для растаможки груза из Китая: как не ошибиться в первый раз",
+      "caption_ru": "Знаете, из-за чего чаще всего задерживают груз на таможне? Не из-за «сложных правил», а из-за неверного кода ТН ВЭД и неполных документов.\n\nКод определяет, какие пошлины и сборы Вы заплатите и нужны ли сертификаты. Поэтому его лучше проверить до отправки товара, а не на границе.\n\n📄 Что нужно подготовить: инвойс, упаковочный лист, контракт, транспортную накладную и описание товара.\n\nЧем точнее описание (материал, назначение, модель), тем меньше вопросов у таможни. Сроки и решения зависят от таможенных органов, но хорошая подготовка заметно снижает риски.\n\nНапишите нам в Telegram или позвоните, и мы бесплатно подскажем код и список документов для Вашего товара 🤝",
+      "caption_kaa": "Júk gúrrińde ásirese neden toqtap qaladı, bilesiz be? «Qıyın qaǵıydalardan» emes, kóbinese TN VED kodı qate kórsetilgeni hám hújjetler tolıq bolmaǵanınan.\n\nKod Siz qansha bajı hám jıyım tólewińizdi, sertifikat kerek-kerek emesligin belgileydi. Sol sebepli oǵan tovar jiberilmesten aldın tekseriw jaqsı, shegarada emes.\n\n📄 Tayarlaw kerek: invoys, qaptaw dizimi, kontrakt, transport nakladnoyı hám tovar táripi.\n\nTáripi qanshelli anıq bolsa (material, maqset, model), gúmrik soraǵı sonshelli az boladı. Mereke hám sheshimler gúmrik organlarına baylanıslı, biraq jaqsı tayarlıq qáwip-qáterdi kemeytedi.\n\nTelegramda jazıń yamasa qońıraw etiń, Sizdiń tovarıńızǵa kod hám hújjetler dizimin biypul aytıp beremiz 🤝",
+      "hashtags": [
+        "#ТНВЭД",
+        "#растаможка",
+        "#доставкаизКитая",
+        "#таможняУзбекистан",
+        "#импорт",
+        "#Нукус",
+        "#Qaraqalpaqstan",
+        "#gúmrik"
+      ],
+      "photo_tag": "container",
+      "slides": [
+        {
+          "kind": "cover",
+          "big": "",
+          "title_ru": "Код ТН ВЭД: ошибка, которая дорого стоит",
+          "text_ru": "Как подготовить груз из Китая к таможне и не получить неприятных сюрпризов",
+          "title_kaa": "TN VED kodı: qımbatqa túsetuǵın qate",
+          "text_kaa": "Qıtaydan keletuǵın júkti gúmrikke qalay tayarlap, kútilmegen jaǵdaylardan qutılıw kerek"
+        },
+        {
+          "kind": "point",
+          "big": "",
+          "title_ru": "Что такое код ТН ВЭД",
+          "text_ru": "Это цифровой код товара. От него зависят пошлина, НДС, нужные разрешения и сертификаты.",
+          "title_kaa": "TN VED kodı degenimiz ne",
+          "text_kaa": "Bul tovardıń sanlı kodı. Bajı, QQS, ruxsatnamalar hám sertifikatlar sonnan ǵárezli."
+        },
+        {
+          "kind": "point",
+          "big": "",
+          "title_ru": "Какие документы нужны",
+          "text_ru": "📄 Инвойс, упаковочный лист, контракт, транспортная накладная, описание товара. Список может зависеть от вида груза.",
+          "title_kaa": "Qanday hújjetler kerek",
+          "text_kaa": "📄 Invoys, qaptaw dizimi, kontrakt, transport nakladnoy, tovar táripi. Dizim júk túrine qaray ózgeriwi mumkin."
+        },
+        {
+          "kind": "qa",
+          "big": "",
+          "title_ru": "Можно ли выбрать код «подешевле»?",
+          "text_ru": "Нет. Код определяется по составу и назначению товара. Неверный код может привести к штрафам и задержке груза.",
+          "title_kaa": "«Arzanıraq» kodtı tańlasa boladı ma?",
+          "text_kaa": "Joq. Kod tovardıń quramı hám maqsetine qaray belgilenedi. Qate kod jaza hám keshigiwge alıp keliwi mumkin."
+        },
+        {
+          "kind": "point",
+          "big": "",
+          "title_ru": "Как описать товар",
+          "text_ru": "Укажите материал, назначение, модель, производителя. Фраза «запчасти» или «товары для дома» — слишком общая.",
+          "title_kaa": "Tovardı qalay táriplew kerek",
+          "text_kaa": "Material, maqset, model, islep shıǵarıwshını kórsetiń. «Ehtiyat bólekler» yamasa «úy buyımları» — júdá ulıwma."
+        },
+        {
+          "kind": "point",
+          "big": "",
+          "title_ru": "Проверяйте до отправки",
+          "text_ru": "Покажите нам инвойс и фото товара до выкупа или отгрузки. Так проще заранее понять платежи и документы.",
+          "title_kaa": "Jibermesten aldın tekseriń",
+          "text_kaa": "Satıp almastan yamasa jibermesten aldın invoys hám tovar suwretin kórsetiń. Tólemler hám hújjetlerdi aldınan bilgen qolay."
+        },
+        {
+          "kind": "cta",
+          "big": "",
+          "title_ru": "Рассчитаем для Вас",
+          "text_ru": "Напишите в Telegram или позвоните: подскажем код и документы для Вашего товара. AMU Logistics, с 2017 года.",
+          "title_kaa": "Siz ushın esaplap beremiz",
+          "text_kaa": "Telegramda jazıń yamasa qońıraw etiń: tovarıńızǵa kod hám hújjetlerdi aytamız. AMU Logistics, 2017-jıldan beri."
+        }
+      ],
+      "sources": [
+        "Общие правила классификации товаров по ТН ВЭД (customs.uz); конкретные ставки намеренно не указаны"
+      ],
+      "needs_fact_check": false,
+      "content_type": "customs_faq",
+      "format": "carousel"
+    },
+    "media": {
+      "files": [
+        "20261101-2343-6064/feed-1.jpg",
+        "20261101-2343-6064/feed-2.jpg",
+        "20261101-2343-6064/feed-3.jpg",
+        "20261101-2343-6064/feed-4.jpg",
+        "20261101-2343-6064/feed-5.jpg",
+        "20261101-2343-6064/feed-6.jpg",
+        "20261101-2343-6064/feed-7.jpg"
+      ],
+      "photo": "container-loading.jpg"
+    },
+    "edits": 0,
+    "wish": "",
+    "preview_msg_id": 20
+  },
   "awaiting_edit": null,
   "last_metrics_at": "2026-11-01T23:39:24.476746+05:00",
   "last_learn_at": "2026-11-01T23:39:24.476746+05:00",
   "last_error_at": null,
-  "last_draft_at": null
+  "last_draft_at": "2026-11-01T23:43:31.521473+05:00"
 }
