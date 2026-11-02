@@ -2,7 +2,9 @@ name: content-bot
 
 on:
   schedule:
-    - cron: "*/15 * * * *"   # every 15 minutes; the bot itself decides whether to do anything
+    # Main trigger: cron-job.org calls workflow_dispatch every 10 minutes (GitHub's own schedule runs late).
+    # This hourly schedule is only a backup in case cron-job.org is down.
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 # Never two runs at once: they would both read and write data/*.json
