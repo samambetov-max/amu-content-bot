@@ -17,6 +17,30 @@
       "topic": "Добро пожаловать в канал AMU Logistics: кто мы и чем будем полезны импортёрам из Китая",
       "content_type": "welcome",
       "format": "carousel"
+    },
+    {
+      "id": "20261102-0017-76b4",
+      "created_at": "2026-11-02T00:17:13.164778+05:00",
+      "published_at": "2026-11-02T09:09:19.119476+05:00",
+      "topic": "Как выбрать способ доставки из Китая: ЖД, фура, сборный груз или авиа",
+      "content_type": "welcome",
+      "format": "carousel",
+      "photo": "container-loading.jpg",
+      "approved_by": "timeout",
+      "edits": 0,
+      "metrics": {},
+      "tg_message_ids": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "ig_id": "18109026662290911",
+      "ig_permalink": "https://www.instagram.com/p/DfOaoWdjT0A/"
     }
   ]
 }
