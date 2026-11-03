@@ -1,0 +1,12 @@
+# Start:  docker compose -f docker-compose.clientbot.yml up -d --build
+# Logs:   docker compose -f docker-compose.clientbot.yml logs -f
+services:
+  clientbot:
+    build:
+      context: .
+      dockerfile: Dockerfile.clientbot
+    restart: always
+    env_file: .env
+    volumes:
+      - ./clientdata:/data
+      - ./config:/app/config:ro   # edit config/ on the server, the bot picks it up without a restart
