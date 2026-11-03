@@ -58,7 +58,7 @@
       "topic": "Почему таможня может пересчитать стоимость груза и как подтвердить цену товара документами",
       "content_type": "customs_faq",
       "format": "photo",
-      "photo": "pixabay:5212059",
+      "photo": "pixabay:1044172",
       "approved_by": "timeout",
       "edits": 0,
       "metrics": {
@@ -66,7 +66,8 @@
       },
       "tg_message_ids": [
         11
-      ]
+      ],
+      "photo_query": "customs officer documents warehouse"
     }
   ]
 }
