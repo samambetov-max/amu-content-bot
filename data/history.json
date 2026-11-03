@@ -35,7 +35,8 @@
           "comments": 0,
           "saved": 0,
           "shares": 0
-        }
+        },
+        "tg_reactions": 1
       },
       "tg_message_ids": [
         3,
@@ -60,7 +61,9 @@
       "photo": "pixabay:5212059",
       "approved_by": "timeout",
       "edits": 0,
-      "metrics": {},
+      "metrics": {
+        "tg_reactions": 1
+      },
       "tg_message_ids": [
         11
       ]
