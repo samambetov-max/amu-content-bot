@@ -1,0 +1,13 @@
+# Bot that answers clients on your behalf (Telegram Business). Runs non-stop on any server.
+FROM python:3.12-slim
+WORKDIR /app
+# Claude Code is needed only if the bot uses a Claude Pro/Max subscription (CLAUDE_CODE_OAUTH_TOKEN)
+RUN apt-get update && apt-get install -y --no-install-recommends nodejs npm && rm -rf /var/lib/apt/lists/* \
+    && npm install -g @anthropic-ai/claude-code
+RUN pip install --no-cache-dir requests==2.34.2 PyYAML==6.0.3 anthropic==2.4.0 tzdata
+COPY bot ./bot
+COPY clientbot ./clientbot
+COPY config ./config
+ENV CLIENT_BOT_DATA=/data PYTHONUNBUFFERED=1
+VOLUME /data
+CMD ["python", "-m", "clientbot"]
