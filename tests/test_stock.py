@@ -8,7 +8,7 @@ from bot.config import Secrets, load_brand
 
 PEXELS = {"photos": [{"id": i, "width": 3000, "photographer": "A", "src": {"original": f"https://p/{i}.jpg"}} for i in (1, 2)]
           + [{"id": 3, "width": 600, "src": {"original": "https://p/small.jpg"}}]}
-OPENVERSE = {"results": [{"id": "x", "width": 2000, "url": "https://o/x.jpg", "creator": "B"}]}
+OPENVERSE = {"results": [{"id": "x", "width": 2000, "url": "https://o/x.jpg", "creator": "B", "tags": [{"name": "truck"}]}]}
 
 
 class Resp:
@@ -99,3 +99,27 @@ def test_pixabay_drops_toys_and_off_topic(monkeypatch):
 def test_relevance_counts_query_words():
     assert stock.relevance("shipping containers port", "container ship, port, logistics") == 3
     assert stock.relevance("shipping containers port", "milk can, flower") == 0
+
+
+def test_pixabay_drops_photos_matched_only_by_generic_words(monkeypatch):
+    barber = {"id": 5212059, "largeImageURL": "https://x/b.jpg",
+              "tags": "barber shop, iran, cosmetology, people, job, work, office, business, men"}
+    docs = {"id": 8, "largeImageURL": "https://x/d.jpg", "tags": "documents, invoice, office, business"}
+    monkeypatch.setattr(stock.requests, "get", lambda url, **kw: Resp({"hits": [barber, docs]}))
+    assert [p.key for p in stock._pixabay("invoice documents office business", "k")] == ["pixabay:8"]
+
+
+def test_openverse_drops_off_trade_photos(monkeypatch):
+    body = {"results": [{"id": "cat", "width": 2000, "url": "https://o/c.jpg", "tags": [{"name": "cat"}], "title": "Cat"},
+                        {"id": "port", "width": 2000, "url": "https://o/p.jpg", "tags": [], "title": "Container port"}]}
+    monkeypatch.setattr(stock.requests, "get", lambda url, **kw: Resp(body))
+    assert [p.key for p in stock._openverse("container port")] == ["openverse:port"]
+
+
+def test_generic_words_do_not_count():
+    assert stock.relevance("business office people", "office, business, people") == 0
+
+
+def test_trade_words_match_whole():
+    assert stock.trade_score("portrait, sport, training") == 0
+    assert stock.trade_score("ports, containers, documentation") == 3

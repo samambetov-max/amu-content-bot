@@ -35,24 +35,49 @@ def _pexels(query: str, api_key: str) -> list[StockPhoto]:
 
 # Tags that make a cover look fake or out of place for the audience
 BANNED_TAGS = {"toy", "model", "miniature", "lego", "military", "army", "tank", "weapon", "war", "alcohol", "beer",
-               "wine", "pork", "pig", "bikini", "cartoon", "illustration", "3d", "render"}
+               "wine", "pork", "pig", "bikini", "cartoon", "illustration", "3d", "render", "barber", "barbershop",
+               "hair", "hairdresser", "salon", "cosmetology", "makeup", "beauty", "fashion", "wedding", "bride"}
+# A cover must show something from the trade. Short words match whole (plural too): "port" is not "portrait".
+DOMAIN_STEMS = ("container", "cargo", "truck", "lorry", "freight", "logistic", "shipping", "shipment", "ship", "port",
+                "harbor", "harbour", "warehouse", "pallet", "forklift", "crane", "train", "railway", "rail", "wagon", "locomotive",
+                "delivery", "package", "parcel", "box", "cardboard", "customs", "border", "transport", "aircraft",
+                "airplane", "plane", "airport", "document", "invoice", "paperwork", "contract", "calculator", "stamp",
+                "export", "import", "trade", "storage", "highway", "goods")
+# Words that fit almost any photo and prove nothing about the topic
+GENERIC_WORDS = {"office", "business", "people", "person", "man", "men", "woman", "women", "work", "worker", "job",
+                 "life", "lifestyle", "young", "city", "modern", "professional", "background", "concept"}
+
+
+def _words(tags: str) -> set[str]:
+    return {w for t in tags.lower().split(",") for w in t.split()}
+
+
+def _is_trade(word: str) -> bool:
+    return any(word.rstrip("s") == s or (len(s) >= 6 and word.startswith(s)) for s in DOMAIN_STEMS)
+
+
+def trade_score(tags: str) -> int:
+    return sum(map(_is_trade, _words(tags)))
 
 
 def _clean(tags: str) -> bool:
-    return not ({t.strip().lower() for t in tags.split(",")} & BANNED_TAGS)
+    """No banned tag, and at least one tag from the logistics trade."""
+    words = _words(tags)
+    return not ({t.strip().lower() for t in tags.split(",")} & BANNED_TAGS or words & BANNED_TAGS) \
+        and trade_score(tags) > 0
 
 
 def relevance(query: str, tags: str) -> int:
     """How many query words the photo's tags contain. Words match by stem: "containers" fits "container",
     "shipping" fits "ship"."""
-    words = [w for w in query.lower().split() if len(w) > 2]
-    tag_words = {w for t in tags.lower().split(",") for w in t.split()}
+    words = [w for w in query.lower().split() if len(w) > 2 and w not in GENERIC_WORDS]
+    tag_words = _words(tags) - GENERIC_WORDS
     return sum(any(t.startswith(w[:5]) or (len(t) >= 4 and w.startswith(t)) for t in tag_words) for w in words)
 
 
 def _pixabay(query: str, api_key: str) -> list[StockPhoto]:
     """Editors' choice first (real photography, not hobby shots), only photos whose tags match the query."""
-    need = min(2, len([w for w in query.split() if len(w) > 2])) or 1
+    need = min(2, len([w for w in query.lower().split() if len(w) > 2 and w not in GENERIC_WORDS])) or 1
     base = {"key": api_key, "q": query, "image_type": "photo", "safesearch": "true", "per_page": 100, "order": "popular"}
     ranked = []
     for extra in ({"editors_choice": "true"}, {}):
@@ -60,7 +85,7 @@ def _pixabay(query: str, api_key: str) -> list[StockPhoto]:
         r.raise_for_status()
         hits = [h for h in r.json().get("hits", []) if _clean(h.get("tags", "")) and relevance(query, h.get("tags", "")) >= need]
         # Most relevant first; portrait photos fit the 4:5 card without heavy cropping
-        ranked = sorted(hits, key=lambda h: (-relevance(query, h["tags"]), h.get("imageHeight", 0) < h.get("imageWidth", 0)))
+        ranked = sorted(hits, key=lambda h: (-relevance(query, h["tags"]), -trade_score(h["tags"]), h.get("imageHeight", 0) < h.get("imageWidth", 0)))
         if len(ranked) >= 3:
             break
     # Pixabay forbids hotlinking: the photo is downloaded once and rendered into our own image.
@@ -72,7 +97,8 @@ def _openverse(query: str) -> list[StockPhoto]:
                      headers=UA, timeout=40)
     r.raise_for_status()
     return [StockPhoto(f"openverse:{p['id']}", p["url"], p.get("creator") or p.get("source", ""))
-            for p in r.json().get("results", []) if (p.get("width") or 0) >= MIN_WIDTH]
+            for p in r.json().get("results", []) if (p.get("width") or 0) >= MIN_WIDTH
+            and _clean(", ".join(t.get("name", "") for t in p.get("tags") or []) + ", " + (p.get("title") or ""))]
 
 
 def find(query: str, used: list[str], rng: random.Random, pexels_key: str = "", pixabay_key: str = "") -> StockPhoto | None:

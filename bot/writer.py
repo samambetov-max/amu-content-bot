@@ -73,7 +73,7 @@ def build_prompt(brand: dict, strategy: dict, history: dict, content_type: str, 
 {caption_fields},
   "hashtags": ["5–8 хэштегов по теме, без общих #amulogistics"],
   "photo_tag": "одно из: truck, container, warehouse, rail, crates, pallets, night, arrival",
-  "photo_query": "2–4 английских слова для поиска живого стокового фото под тему (cargo truck highway, customs officer documents, container port sunset). Реалистичная сцена без текста и логотипов; без алкоголя и неуместной одежды",
+  "photo_query": "2–4 английских слова для поиска живого стокового фото под тему (cargo truck highway, customs officer documents, container port sunset). Называй предметы логистики, которые видно на фото (контейнер, фура, склад, поезд, документы, накладная), а не «office», «business», «people». Реалистичная сцена без текста и логотипов; без алкоголя и неуместной одежды",
   "slides": [{{"kind": "cover|point|fact|qa|cta", "big": "для fact — короткая цифра до 7 символов (12%, 30 дней, 2027), иначе пусто", {slide_fields}}}],
   "sources": ["ссылки или названия источников"],
   "needs_fact_check": true или false — есть ли в посте цифры/нормы, которые человек должен проверить

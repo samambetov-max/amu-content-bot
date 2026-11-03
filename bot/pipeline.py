@@ -132,7 +132,7 @@ def publish(ctx: Ctx, pending: dict, now: datetime, approved_by: str) -> tuple[d
     entry = {
         "id": pending["id"], "created_at": pending["created_at"], "published_at": now.isoformat(),
         "topic": post.get("topic", ""), "content_type": post["content_type"], "format": post["format"],
-        "photo": pending["media"]["photo"], "approved_by": approved_by, "edits": pending.get("edits", 0),
+        "photo": pending["media"]["photo"], "photo_query": post.get("photo_query", ""), "approved_by": approved_by, "edits": pending.get("edits", 0),
         "metrics": {},
     }
     problems = []
