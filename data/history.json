@@ -49,6 +49,21 @@
       ],
       "ig_id": "18109026662290911",
       "ig_permalink": "https://www.instagram.com/p/DfOaoWdjT0A/"
+    },
+    {
+      "id": "20261103-1100-0d17",
+      "created_at": "2026-11-03T11:00:47.103855+05:00",
+      "published_at": "2026-11-03T13:00:46.680548+05:00",
+      "topic": "Почему таможня может пересчитать стоимость груза и как подтвердить цену товара документами",
+      "content_type": "customs_faq",
+      "format": "photo",
+      "photo": "pixabay:5212059",
+      "approved_by": "timeout",
+      "edits": 0,
+      "metrics": {},
+      "tg_message_ids": [
+        11
+      ]
     }
   ]
 }
