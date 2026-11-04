@@ -77,6 +77,30 @@
       "photo_query": "customs officer documents warehouse",
       "ig_id": "17995434654106867",
       "ig_permalink": "https://www.instagram.com/p/DfRk_RGGE5a/"
+    },
+    {
+      "id": "20261104-1701-d393",
+      "created_at": "2026-11-04T17:01:02.788924+05:00",
+      "published_at": "2026-11-04T19:01:00.375350+05:00",
+      "topic": "Стальная коробка, изменившая мировую торговлю: откуда взялся контейнер и что значит 20' и 40'",
+      "content_type": "interesting_fact",
+      "format": "carousel",
+      "photo": "pixabay:7418239",
+      "photo_query": "shipping containers stacked port",
+      "approved_by": "timeout",
+      "edits": 0,
+      "metrics": {},
+      "tg_message_ids": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "ig_id": "18129856780856904",
+      "ig_permalink": "https://www.instagram.com/p/DfUn71vieBm/"
     }
   ]
 }
