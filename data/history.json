@@ -89,7 +89,9 @@
       "photo_query": "shipping containers stacked port",
       "approved_by": "timeout",
       "edits": 0,
-      "metrics": {},
+      "metrics": {
+        "tg_reactions": 2
+      },
       "tg_message_ids": [
         12,
         13,
