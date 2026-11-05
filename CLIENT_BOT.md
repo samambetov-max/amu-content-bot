@@ -67,6 +67,19 @@ docker compose -f docker-compose.clientbot.yml up -d --build
 
 Без Docker: `pip install -r requirements.txt`, затем `python -m clientbot` (с теми же переменными окружения).
 
+**На Mac** (бот отвечает, пока Mac включён и крышка открыта):
+
+```bash
+cd ~
+git clone https://github.com/samambetov-max/amu-content-bot.git
+cd amu-content-bot
+printf 'CLIENT_BOT_TOKEN=токен_из_BotFather\nANTHROPIC_API_KEY=sk-ant-...\n' > .env
+./run_clientbot.sh
+```
+
+Окно Терминала не закрывайте: бот работает, пока оно открыто. Остановить — Ctrl+C,
+запустить снова — `cd ~/amu-content-bot && ./run_clientbot.sh`.
+
 Переписка и всё, чему бот научился, хранится в папке `clientdata/` на сервере. Её не надо удалять:
 там вся память бота. Делайте её копию, если переезжаете на другой сервер.
 
