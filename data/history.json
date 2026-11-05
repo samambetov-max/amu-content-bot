@@ -30,7 +30,7 @@
       "edits": 0,
       "metrics": {
         "ig": {
-          "reach": 2,
+          "reach": 3,
           "likes": 0,
           "comments": 0,
           "saved": 0,
@@ -64,7 +64,7 @@
       "metrics": {
         "tg_reactions": 1,
         "ig": {
-          "reach": 2,
+          "reach": 3,
           "likes": 0,
           "comments": 0,
           "saved": 0,
@@ -90,7 +90,14 @@
       "approved_by": "timeout",
       "edits": 0,
       "metrics": {
-        "tg_reactions": 2
+        "tg_reactions": 2,
+        "ig": {
+          "reach": 2,
+          "likes": 0,
+          "comments": 0,
+          "saved": 0,
+          "shares": 0
+        }
       },
       "tg_message_ids": [
         12,
