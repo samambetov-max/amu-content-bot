@@ -1,11 +1,14 @@
 """Text generation: Claude through Claude Code (Pro/Max subscription), Anthropic API or Google Gemini (free tier)."""
+import base64
 import json
 import logging
 import os
 import re
+import shutil
 import subprocess
 import tempfile
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import requests
 
@@ -109,16 +112,20 @@ def _anthropic(secrets: Secrets, model: str, system: str, prompt: str, search: b
     return LLMResult(text=text, sources=sources)
 
 
-def _claude_code(secrets: Secrets, model: str, system: str, prompt: str, search: bool) -> LLMResult:
-    """Headless Claude Code: bills the Claude subscription through CLAUDE_CODE_OAUTH_TOKEN (`claude setup-token`)."""
-    tools = "WebSearch,WebFetch" if search else ""
+def _claude_code(secrets: Secrets, model: str, system: str, prompt: str, search: bool,
+                 files: tuple[Path, ...] = ()) -> LLMResult:
+    """Headless Claude Code: bills the Claude subscription through CLAUDE_CODE_OAUTH_TOKEN (`claude setup-token`).
+    Files are copied next to it and can be opened with Read (Claude sees images this way)."""
+    tools = ",".join((["WebSearch", "WebFetch"] if search else []) + (["Read"] if files else []))
     cmd = ["claude", "-p", "--output-format", "json", "--model", model, "--system-prompt", system,
            "--tools", tools, "--setting-sources", "project", "--strict-mcp-config", "--no-session-persistence"]
-    if search:
+    if tools:
         cmd += ["--allowedTools", tools]
     env = {**os.environ, "CLAUDE_CODE_OAUTH_TOKEN": secrets.claude_oauth_token} if secrets.claude_oauth_token else None
     # An empty folder as cwd: no project files or settings leak into the prompt.
     with tempfile.TemporaryDirectory() as cwd:
+        for f in files:
+            shutil.copy2(f, Path(cwd) / f.name)
         try:
             res = subprocess.run(cmd, input=prompt, capture_output=True, text=True, cwd=cwd, env=env,
                                  timeout=CLAUDE_CODE_TIMEOUT)
@@ -175,3 +182,42 @@ def generate_json(secrets: Secrets, brand: dict, system: str, prompt: str, searc
             log.warning("retrying after bad JSON: %s", err)
             last_err = err
     raise last_err
+
+
+PHOTO_CHECK = """Ты фоторедактор каналов логистической компании: доставка грузов из Китая в Узбекистан, растаможка.
+Решаешь, подходит ли стоковое фото обложкой к посту. Подходит, только если на фото видно то, о чём пост, или
+логистику в целом: грузы, контейнеры, фуры, поезда, склады, порты, таможенный досмотр, деловые документы на груз,
+расчёты. Не подходит: паспорта, путешествия, туризм, люди без связи с грузами, салоны, еда, животные, игрушки,
+военное, всё, что зритель не свяжет с темой поста. Ответь только JSON: {"fit": true или false, "reason": "коротко"}"""
+
+
+def photo_fits(secrets: Secrets, brand: dict, image: Path, topic: str) -> tuple[bool, str]:
+    """Claude looks at the cover photo and says whether it matches the post. Raises LLMError when no model can see it."""
+    cfg = brand.get("llm", {})
+    prompt = f"Тема поста: {topic}\nФото: файл {image.name}. Открой его и оцени."
+    if secrets.claude_oauth_token or cfg.get("provider") == "claude_code":
+        try:
+            res = _claude_code(secrets, cfg.get("claude_code_model", "sonnet"), PHOTO_CHECK, prompt, False, (image,))
+            verdict = parse_json(res.text)
+            return bool(verdict.get("fit")), str(verdict.get("reason", ""))
+        except LLMError as err:
+            log.warning("photo check via Claude Code failed: %s", err)
+    if secrets.anthropic_key:
+        return _anthropic_photo_check(secrets, cfg.get("anthropic_model", "claude-sonnet-5-5"), image, topic)
+    raise LLMError("no model available to check the photo")
+
+
+def _anthropic_photo_check(secrets: Secrets, model: str, image: Path, topic: str) -> tuple[bool, str]:
+    data = base64.b64encode(image.read_bytes()).decode()
+    body = {"model": model, "max_tokens": 300, "system": PHOTO_CHECK, "messages": [{"role": "user", "content": [
+        {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": data}},
+        {"type": "text", "text": f"Тема поста: {topic}"}]}]}
+    try:
+        r = requests.post(ANTHROPIC_URL, json=body, timeout=TIMEOUT,
+                          headers={"x-api-key": secrets.anthropic_key, "anthropic-version": "2023-06-01"})
+    except requests.RequestException as err:
+        raise LLMError(f"Anthropic request failed: {err}") from err
+    if r.status_code != 200:
+        raise LLMError(f"Anthropic HTTP {r.status_code}: {r.text[:300]}")
+    verdict = parse_json("".join(b.get("text", "") for b in r.json().get("content", [])))
+    return bool(verdict.get("fit")), str(verdict.get("reason", ""))

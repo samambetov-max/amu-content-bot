@@ -6,7 +6,7 @@ from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from . import captions, instagram, media_store, render, stock, telegram, video, writer
+from . import captions, instagram, llm, media_store, render, stock, telegram, video, writer
 from .config import MEDIA_DIR, OUT_DIR, Secrets
 
 log = logging.getLogger(__name__)
@@ -41,12 +41,24 @@ def choose_photo(ctx: Ctx, post: dict, work: Path) -> tuple[Path, str]:
     used = [p.get("photo", "") for p in ctx.history.get("posts", [])]
     query = str(post.get("photo_query", "")).strip()
     if query and ctx.rng.random() < ctx.brand.get("stock_photo_share", 0.6):
-        found = stock.find(query, used, ctx.rng, ctx.secrets.pexels_key, ctx.secrets.pixabay_key)
-        path = stock.download(found, work / "stock.jpg") if found else None
-        if path:
-            return path, found.key
+        for found in stock.candidates(query, used, ctx.rng, ctx.secrets.pexels_key, ctx.secrets.pixabay_key):
+            path = stock.download(found, work / "stock.jpg")
+            if path and _photo_fits(ctx, path, post):
+                return path, found.key
     own = render.pick_photo(post.get("photo_tag", ""), used, ctx.rng)
     return own, own.name
+
+
+def _photo_fits(ctx: Ctx, path: Path, post: dict) -> bool:
+    """Tags can lie (a passport tagged "customs"), so Claude looks at the photo itself.
+    When no model can look, the stock photo is not used."""
+    try:
+        fits, reason = llm.photo_fits(ctx.secrets, ctx.brand, path, f"{post.get('topic', '')} ({post.get('photo_query', '')})")
+    except llm.LLMError as err:
+        log.warning("photo check unavailable, using own photo: %s", err)
+        return False
+    log.info("photo check: %s, %s", "fits" if fits else "rejected", reason)
+    return fits
 
 
 def render_media(ctx: Ctx, post: dict, post_id: str) -> dict:

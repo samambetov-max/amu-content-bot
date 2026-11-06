@@ -243,3 +243,20 @@ def test_welcome_prompt_ignores_earlier_drafts():
 def test_telegram_caption_is_clean():
     text = captions.build(SAMPLE, BRAND, "telegram")
     assert "#" not in text and "Instagram" not in text and "+86 193 2064 5050" in text
+
+
+def test_photo_fits_reads_claude_verdict(monkeypatch, tmp_path):
+    from bot import llm
+    from bot.config import Secrets
+    img = tmp_path / "stock.jpg"
+    img.write_bytes(b"img")
+    calls = []
+
+    def fake(secrets, model, system, prompt, search, files=()):
+        calls.append(files)
+        return llm.LLMResult(text='{"fit": false, "reason": "паспорта"}')
+
+    monkeypatch.setattr(llm, "_claude_code", fake)
+    secrets = Secrets("", "", "t", "1", "@c", "", "", "", claude_oauth_token="x")
+    assert llm.photo_fits(secrets, {"llm": {}}, img, "импорт") == (False, "паспорта")
+    assert calls == [(img,)]

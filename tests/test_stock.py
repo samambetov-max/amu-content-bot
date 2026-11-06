@@ -57,6 +57,7 @@ def ctx(share):
 
 
 def test_choose_photo_uses_stock_or_own(monkeypatch, tmp_path):
+    monkeypatch.setattr(pipeline.llm, "photo_fits", lambda *a: (True, "ok"))
     monkeypatch.setattr(stock.requests, "get", lambda url, **kw: Resp(PEXELS) if "api." in url
                         else Resp(content=b"img", ctype="image/jpeg"))
     post = {"photo_query": "cargo truck", "photo_tag": "truck"}
@@ -123,3 +124,33 @@ def test_generic_words_do_not_count():
 def test_trade_words_match_whole():
     assert stock.trade_score("portrait, sport, training") == 0
     assert stock.trade_score("ports, containers, documentation") == 3
+
+
+def test_choose_photo_skips_photos_claude_rejects(monkeypatch, tmp_path):
+    monkeypatch.setattr(stock.requests, "get", lambda url, **kw: Resp(PEXELS) if "api." in url
+                        else Resp(content=url.encode(), ctype="image/jpeg"))
+    seen = []
+
+    def fits(secrets, brand, image, topic):
+        seen.append(image.read_bytes())
+        return len(seen) == 2, "second one"
+
+    monkeypatch.setattr(pipeline.llm, "photo_fits", fits)
+    path, key = pipeline.choose_photo(ctx(1), {"photo_query": "cargo truck", "topic": "t"}, tmp_path)
+    assert len(seen) == 2 and key.startswith("pexels:") and path.read_bytes() == seen[1]
+
+
+def test_choose_photo_uses_own_when_check_unavailable(monkeypatch, tmp_path):
+    monkeypatch.setattr(stock.requests, "get", lambda url, **kw: Resp(PEXELS) if "api." in url
+                        else Resp(content=b"img", ctype="image/jpeg"))
+
+    def fail(*a):
+        raise pipeline.llm.LLMError("no model")
+
+    monkeypatch.setattr(pipeline.llm, "photo_fits", fail)
+    _, key = pipeline.choose_photo(ctx(1), {"photo_query": "cargo truck"}, tmp_path)
+    assert key.endswith(".jpg") and not key.startswith("pexels:")
+
+
+def test_travel_photos_banned_even_with_customs_tag():
+    assert not stock._clean("passport, documentation, travel, document, visa, customs")

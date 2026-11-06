@@ -36,7 +36,9 @@ def _pexels(query: str, api_key: str) -> list[StockPhoto]:
 # Tags that make a cover look fake or out of place for the audience
 BANNED_TAGS = {"toy", "model", "miniature", "lego", "military", "army", "tank", "weapon", "war", "alcohol", "beer",
                "wine", "pork", "pig", "bikini", "cartoon", "illustration", "3d", "render", "barber", "barbershop",
-               "hair", "hairdresser", "salon", "cosmetology", "makeup", "beauty", "fashion", "wedding", "bride"}
+               "hair", "hairdresser", "salon", "cosmetology", "makeup", "beauty", "fashion", "wedding", "bride",
+               "passport", "visa", "travel", "traveler", "tourist", "tourism", "trip", "vacation", "immigration",
+               "emigration", "citizenship", "identification"}
 # A cover must show something from the trade. Short words match whole (plural too): "port" is not "portrait".
 DOMAIN_STEMS = ("container", "cargo", "truck", "lorry", "freight", "logistic", "shipping", "shipment", "ship", "port",
                 "harbor", "harbour", "warehouse", "pallet", "forklift", "crane", "train", "railway", "rail", "wagon", "locomotive",
@@ -103,6 +105,13 @@ def _openverse(query: str) -> list[StockPhoto]:
 
 def find(query: str, used: list[str], rng: random.Random, pexels_key: str = "", pixabay_key: str = "") -> StockPhoto | None:
     """A fresh photo for the query, or None when no source answers."""
+    found = candidates(query, used, rng, pexels_key, pixabay_key, limit=1)
+    return found[0] if found else None
+
+
+def candidates(query: str, used: list[str], rng: random.Random, pexels_key: str = "", pixabay_key: str = "",
+               limit: int = 3) -> list[StockPhoto]:
+    """A few fresh photos for the query in random order, from the first source that answers."""
     sources = ([lambda: _pixabay(query, pixabay_key)] if pixabay_key else []) \
         + ([lambda: _pexels(query, pexels_key)] if pexels_key else []) + [lambda: _openverse(query)]
     for source in sources:
@@ -112,8 +121,8 @@ def find(query: str, used: list[str], rng: random.Random, pexels_key: str = "", 
             log.warning("stock search failed: %s", err)
             continue
         if photos:
-            return rng.choice(photos[:15])
-    return None
+            return rng.sample(photos[:15], min(limit, len(photos[:15])))
+    return []
 
 
 def download(photo: StockPhoto, target: Path) -> Path | None:
