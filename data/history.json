@@ -216,7 +216,9 @@
       "photo_query": "shipping containers port loading",
       "approved_by": "timeout",
       "edits": 0,
-      "metrics": {},
+      "metrics": {
+        "tg_reactions": 2
+      },
       "tg_message_ids": [
         35,
         36,
