@@ -250,7 +250,9 @@
       "photo_query": "customs officer inspecting parcels",
       "approved_by": "timeout",
       "edits": 0,
-      "metrics": {},
+      "metrics": {
+        "tg_reactions": 2
+      },
       "tg_message_ids": [
         43,
         44,
