@@ -316,7 +316,15 @@
       "photo_query": "boxes smartphones warehouse customs",
       "approved_by": "timeout",
       "edits": 0,
-      "metrics": {},
+      "metrics": {
+        "ig": {
+          "reach": 0,
+          "likes": 0,
+          "comments": 0,
+          "saved": 0,
+          "shares": 0
+        }
+      },
       "tg_message_ids": [
         58
       ],
