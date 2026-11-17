@@ -371,7 +371,9 @@
       "photo_query": "customs officer documents cargo",
       "approved_by": "timeout",
       "edits": 1,
-      "metrics": {},
+      "metrics": {
+        "tg_reactions": 2
+      },
       "tg_message_ids": [
         60
       ],
