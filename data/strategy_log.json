@@ -45,6 +45,52 @@
           "company_service": 0.12
         }
       }
+    },
+    {
+      "at": "2026-11-17T14:00+05:00",
+      "summary": "Данных пока мало: охват в Instagram 3–6 на пост, а в Telegram 1–2 реакции, и разницы между типами, форматами и часами почти нет. Поэтому расписание и частоту оставляю прежними, меняю осторожно. Увеличил долю Reels до 25% как эксперимент и добавил долю постов об услугах компании (17%), чтобы вести к заявкам. Уменьшил долю интересных фактов, так как они не дали преимущества. Главная задача — поднять охват: добавлять конкретные призывы (сохранить, переслать, задать вопрос), хэштеги и тестировать Reels.",
+      "before": {
+        "posts_per_week": 5,
+        "best_hours": [
+          9,
+          13,
+          19
+        ],
+        "format_weights": {
+          "photo": 0.4,
+          "carousel": 0.4,
+          "reels": 0.2
+        },
+        "type_weights": {
+          "customs_faq": 0.26,
+          "law_update": 0.2,
+          "useful_tips": 0.22,
+          "interesting_fact": 0.1,
+          "news_hype": 0.1,
+          "company_service": 0.12
+        }
+      },
+      "after": {
+        "posts_per_week": 5,
+        "best_hours": [
+          9,
+          13,
+          19
+        ],
+        "format_weights": {
+          "photo": 0.35,
+          "carousel": 0.4,
+          "reels": 0.25
+        },
+        "type_weights": {
+          "customs_faq": 0.25,
+          "law_update": 0.2,
+          "useful_tips": 0.2,
+          "interesting_fact": 0.08,
+          "news_hype": 0.1,
+          "company_service": 0.17
+        }
+      }
     }
   ]
 }
