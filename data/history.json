@@ -398,7 +398,9 @@
       "photo_query": "warehouse cargo boxes pallets",
       "approved_by": "timeout",
       "edits": 0,
-      "metrics": {},
+      "metrics": {
+        "tg_reactions": 2
+      },
       "tg_message_ids": [
         61
       ],
