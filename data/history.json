@@ -185,7 +185,7 @@
       "metrics": {
         "tg_reactions": 2,
         "ig": {
-          "reach": 5,
+          "reach": 6,
           "likes": 0,
           "comments": 0,
           "saved": 0,
@@ -286,7 +286,7 @@
       "edits": 0,
       "metrics": {
         "ig": {
-          "reach": 6,
+          "reach": 7,
           "likes": 0,
           "comments": 0,
           "saved": 0,
@@ -347,7 +347,7 @@
       "metrics": {
         "tg_reactions": 2,
         "ig": {
-          "reach": 5,
+          "reach": 6,
           "likes": 0,
           "comments": 0,
           "saved": 0,
@@ -374,7 +374,7 @@
       "metrics": {
         "tg_reactions": 2,
         "ig": {
-          "reach": 4,
+          "reach": 5,
           "likes": 0,
           "comments": 0,
           "saved": 0,
@@ -399,7 +399,14 @@
       "approved_by": "timeout",
       "edits": 0,
       "metrics": {
-        "tg_reactions": 2
+        "tg_reactions": 2,
+        "ig": {
+          "reach": 3,
+          "likes": 0,
+          "comments": 0,
+          "saved": 0,
+          "shares": 0
+        }
       },
       "tg_message_ids": [
         61
