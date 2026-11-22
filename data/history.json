@@ -347,7 +347,7 @@
       "metrics": {
         "tg_reactions": 2,
         "ig": {
-          "reach": 6,
+          "reach": 7,
           "likes": 0,
           "comments": 0,
           "saved": 0,
@@ -458,7 +458,15 @@
       "photo_query": "customs officer documents",
       "approved_by": "timeout",
       "edits": 0,
-      "metrics": {},
+      "metrics": {
+        "ig": {
+          "reach": 3,
+          "likes": 0,
+          "comments": 0,
+          "saved": 0,
+          "shares": 0
+        }
+      },
       "tg_message_ids": [
         70
       ],
