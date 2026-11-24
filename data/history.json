@@ -510,7 +510,15 @@
       "photo_query": "cargo containers port documents",
       "approved_by": "timeout",
       "edits": 0,
-      "metrics": {},
+      "metrics": {
+        "ig": {
+          "reach": 2,
+          "likes": 0,
+          "comments": 0,
+          "saved": 0,
+          "shares": 0
+        }
+      },
       "tg_message_ids": [
         72
       ],
