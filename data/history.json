@@ -524,6 +524,22 @@
       ],
       "ig_id": "18103282280438343",
       "ig_permalink": "https://www.instagram.com/p/DgIHvnijQ2t/"
+    },
+    {
+      "id": "20261126-0710-0fbc",
+      "created_at": "2026-11-26T07:10:28.412123+05:00",
+      "published_at": "2026-11-26T09:00:51.006192+05:00",
+      "topic": "США анонсировали новые пошлины для 14 торговых партнёров, включая Китай: что из этого важно импортёру в Узбекистане",
+      "content_type": "interesting_fact",
+      "format": "photo",
+      "photo": "container-crate.jpg",
+      "photo_query": "container port cargo ship",
+      "approved_by": "timeout",
+      "edits": 0,
+      "metrics": {},
+      "tg_message_ids": [
+        73
+      ]
     }
   ]
 }
