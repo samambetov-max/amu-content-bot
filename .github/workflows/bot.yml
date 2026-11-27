@@ -31,6 +31,8 @@ jobs:
         run: |
           pip install -r requirements.txt
           npm install -g @anthropic-ai/claude-code
+          # reels are built with ffmpeg, which the runner image does not ship
+          command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends ffmpeg)
 
       - name: Git identity
         run: |
