@@ -540,6 +540,22 @@
       "tg_message_ids": [
         73
       ]
+    },
+    {
+      "id": "20261127-1110-1f8c",
+      "created_at": "2026-11-27T11:10:29.425991+05:00",
+      "published_at": "2026-11-27T13:00:57.004114+05:00",
+      "topic": "Почему груз из Китая на границе меняет колёса: разная ширина железнодорожной колеи 1435 и 1520 мм",
+      "content_type": "interesting_fact",
+      "format": "photo",
+      "photo": "pixabay:1363771",
+      "photo_query": "freight train containers railway",
+      "approved_by": "timeout",
+      "edits": 0,
+      "metrics": {},
+      "tg_message_ids": [
+        74
+      ]
     }
   ]
 }
