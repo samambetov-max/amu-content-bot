@@ -6,7 +6,7 @@ from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from . import captions, instagram, llm, media_store, render, stock, telegram, video, writer
+from . import captions, instagram, llm, media_store, render, stock, telegram, video, voice, writer
 from .config import MEDIA_DIR, OUT_DIR, Secrets
 
 log = logging.getLogger(__name__)
@@ -64,13 +64,56 @@ def _photo_fits(ctx: Ctx, path: Path, post: dict) -> bool:
 def render_media(ctx: Ctx, post: dict, post_id: str) -> dict:
     work = OUT_DIR / post_id
     photo, photo_key = choose_photo(ctx, post, work)
+    clips = []
     if post["format"] == "reels":
         frames = render.render_slides(post, ctx.brand, work, "story", photo)
-        files = [video.make_reel(frames, work / "reel.mp4", ctx.rng)]
+        reel, clips = _voiced_reel(ctx, post, frames, work)
+        files = [reel or video.make_reel(frames, work / "reel.mp4", ctx.rng)]
     else:
         files = render.render_slides(post, ctx.brand, work, "feed", photo)
     stored = media_store.store(post_id, files)
-    return {"files": [f.relative_to(MEDIA_DIR).as_posix() for f in stored], "photo": photo_key}
+    return {"files": [f.relative_to(MEDIA_DIR).as_posix() for f in stored], "photo": photo_key, "clips": clips}
+
+
+def _clip_for(ctx: Ctx, query: str, topic: str, used: list[str], work: Path, i: int) -> tuple[Path, str] | None:
+    """A stock clip for one scene; Claude checks its preview frame like a cover photo."""
+    for found in stock.videos(query, used, ctx.secrets.pixabay_key)[:3]:
+        thumb = stock.download_file(found.thumb, work / f"thumb-{i}.jpg", "image/") if found.thumb else None
+        if not thumb or not _photo_fits(ctx, thumb, {"topic": topic, "photo_query": query}):
+            continue
+        clip = stock.download_file(found.url, work / f"clip-{i}.mp4", "video/")
+        if clip:
+            return clip, found.key
+    return None
+
+
+def _voiced_reel(ctx: Ctx, post: dict, frames: list[Path], work: Path) -> tuple[Path | None, list[str]]:
+    """Reel with a Russian voice-over over stock clips: the cover opens it, the last slide closes it.
+    Any failure falls back to the plain slideshow reel."""
+    scenes_text = post.get("voiceover") or []
+    if not scenes_text or not ctx.secrets.pixabay_key:
+        return None, []
+    try:
+        phrases = voice.synthesize([s["text"] for s in scenes_text], work / "voice")
+        used = [c for p in ctx.history.get("posts", []) for c in p.get("clips", [])]
+        scenes, keys = [], []
+        for i, scene in enumerate(scenes_text):
+            if i == 0 or i == len(scenes_text) - 1:
+                scenes.append(frames[0] if i == 0 else frames[-1])
+                continue
+            found = _clip_for(ctx, str(scene.get("video_query", "")), post.get("topic", ""), used + keys, work, i)
+            if not found:
+                # a scene without a fitting clip shows a slide instead of something off-topic
+                scenes.append(frames[min(i, len(frames) - 1)])
+                continue
+            scenes.append(found[0])
+            keys.append(found[1])
+        if not keys:
+            return None, []
+        return video.make_voiced_reel(scenes, phrases, work / "reel.mp4", ctx.rng), keys
+    except Exception as err:  # the plain reel is always a safe fallback
+        log.warning("voiced reel failed, using slideshow: %s", err)
+        return None, []
 
 
 def make_draft(ctx: Ctx, now: datetime, publish_at: datetime, wish: str = "",
@@ -144,7 +187,8 @@ def publish(ctx: Ctx, pending: dict, now: datetime, approved_by: str) -> tuple[d
     entry = {
         "id": pending["id"], "created_at": pending["created_at"], "published_at": now.isoformat(),
         "topic": post.get("topic", ""), "content_type": post["content_type"], "format": post["format"],
-        "photo": pending["media"]["photo"], "photo_query": post.get("photo_query", ""), "approved_by": approved_by, "edits": pending.get("edits", 0),
+        "photo": pending["media"]["photo"], "photo_query": post.get("photo_query", ""),
+        "clips": pending["media"].get("clips", []), "approved_by": approved_by, "edits": pending.get("edits", 0),
         "metrics": {},
     }
     problems = []

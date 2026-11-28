@@ -7,6 +7,12 @@ from .config import Secrets
 
 SLIDES = {"photo": "ровно 1 слайд (kind=cover)", "carousel": "5–7 слайдов: cover, затем point/fact/qa, последний cta",
           "reels": "4–6 слайдов: cover, затем point/fact, последний cta (каждый читается за 4 секунды)"}
+REELS_VOICE = """  "voiceover": [{"text": "фраза диктора по-русски", "video_query": "2–4 английских слова: что показать в кадре (container ship port, truck loading boxes)"}] — 5–7 сцен,
+    всего 80–110 слов (30–40 секунд). Живой разговорный русский, как блогер-логист объясняет другу: короткие фразы,
+    без канцелярита, без списков и сокращений, числа и даты пиши словами. Первая сцена — крючок-вопрос или факт,
+    который цепляет за 3 секунды (её читают поверх обложки), последняя — короткий вывод и «пишите нам, посчитаем»
+    (её читают поверх финального слайда). Не упоминай город компании. Видео-запросы — разные, конкретные, про грузы и логистику.
+"""
 LANG_NAMES = {"ru": "русский", "kaa": "каракалпакский (латиница, современная орфография: á, ó, ú, ı, ǵ, ń, sh, ch)",
               "uz": "узбекский (латиница)"}
 NEEDS_SEARCH = {"law_update", "news_hype", "customs_faq", "holiday"}
@@ -74,7 +80,7 @@ def build_prompt(brand: dict, strategy: dict, history: dict, content_type: str, 
   "hashtags": ["5–8 хэштегов по теме, без общих #amulogistics"],
   "photo_tag": "одно из: truck, container, warehouse, rail, crates, pallets, night, arrival",
   "photo_query": "2–4 английских слова для поиска живого стокового фото под тему (cargo truck highway, customs officer documents, container port sunset). Называй предметы логистики, которые видно на фото (контейнер, фура, склад, поезд, документы, накладная), а не «office», «business», «people». Реалистичная сцена без текста и логотипов; без алкоголя и неуместной одежды",
-  "slides": [{{"kind": "cover|point|fact|qa|cta", "big": "для fact — короткая цифра до 7 символов (12%, 30 дней, 2027), иначе пусто", {slide_fields}}}],
+{REELS_VOICE if fmt == "reels" else ""}  "slides": [{{"kind": "cover|point|fact|qa|cta", "big": "для fact — короткая цифра до 7 символов (12%, 30 дней, 2027), иначе пусто", {slide_fields}}}],
   "sources": ["ссылки или названия источников"],
   "needs_fact_check": true или false — есть ли в посте цифры/нормы, которые человек должен проверить
 }}"""
@@ -122,7 +128,9 @@ def validate(post: dict, brand: dict, fmt: str) -> dict:
         missing.append("slides")
     if missing:
         raise llm.LLMError(f"model answer misses {missing}")
-    return {**post, "slides": post["slides"][:1] if fmt == "photo" else post["slides"][:10]}
+    voiceover = [v for v in post.get("voiceover") or [] if isinstance(v, dict) and str(v.get("text", "")).strip()]
+    return {**post, "slides": post["slides"][:1] if fmt == "photo" else post["slides"][:10],
+            "voiceover": voiceover[:8] if fmt == "reels" and len(voiceover) >= 3 else []}
 
 
 def _greeted(history: dict, now: datetime) -> bool:

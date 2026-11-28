@@ -21,7 +21,9 @@ def render_local(post: dict, brand: dict, folder: str) -> None:
     print(f"Фото: {photo_key}")
     if post["format"] == "reels":
         frames = render.render_slides(post, brand, out, "story", photo)
-        video.make_reel(frames, out / "reel.mp4", rng)
+        reel, clips = pipeline._voiced_reel(ctx, post, frames, out)
+        print(f"Рилс: {'с озвучкой, клипы ' + ', '.join(clips) if reel else 'слайд-шоу'}")
+        reel or video.make_reel(frames, out / "reel.mp4", rng)
     else:
         render.render_slides(post, brand, out, "feed", photo)
     for platform in ("telegram", "instagram"):

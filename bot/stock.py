@@ -94,6 +94,46 @@ def _pixabay(query: str, api_key: str) -> list[StockPhoto]:
     return [StockPhoto(f"pixabay:{h['id']}", h["largeImageURL"], f"{h.get('user', '')} / Pixabay") for h in ranked[:8]]
 
 
+PIXABAY_VIDEO_URL = "https://pixabay.com/api/videos/"
+MIN_CLIP_SECONDS = 5
+
+
+@dataclass(frozen=True)
+class StockVideo:
+    key: str  # "pixabay-video:123"
+    url: str
+    thumb: str
+
+
+def videos(query: str, used: list[str], api_key: str) -> list[StockVideo]:
+    """Pixabay clips whose tags match the query and the trade, most relevant first."""
+    need = min(2, len([w for w in query.lower().split() if len(w) > 2 and w not in GENERIC_WORDS])) or 1
+    r = requests.get(PIXABAY_VIDEO_URL, params={"key": api_key, "q": query, "safesearch": "true", "per_page": 50,
+                                                "order": "popular"}, headers=UA, timeout=30)
+    r.raise_for_status()
+    hits = [h for h in r.json().get("hits", []) if _clean(h.get("tags", "")) and h.get("duration", 0) >= MIN_CLIP_SECONDS
+            and relevance(query, h.get("tags", "")) >= need and f"pixabay-video:{h['id']}" not in used]
+    hits.sort(key=lambda h: (-relevance(query, h["tags"]), -trade_score(h["tags"])))
+    # "small" is 1920x1080: enough for a 1080x1920 crop and a fraction of the 4K download
+    return [StockVideo(f"pixabay-video:{h['id']}", h["videos"]["small"]["url"], h["videos"]["small"].get("thumbnail", ""))
+            for h in hits[:8] if h.get("videos", {}).get("small", {}).get("url")]
+
+
+def download_file(url: str, target: Path, kind: str) -> Path | None:
+    """Downloads a file and returns it only when the server says it is of the expected kind (image/, video/)."""
+    try:
+        r = requests.get(url, headers=UA, timeout=120)
+        r.raise_for_status()
+    except requests.RequestException as err:
+        log.warning("download failed: %s", err)
+        return None
+    if not r.headers.get("content-type", "").startswith(kind):
+        return None
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(r.content)
+    return target
+
+
 def _openverse(query: str) -> list[StockPhoto]:
     r = requests.get(OPENVERSE_URL, params={"q": query, "license": "cc0,pdm", "page_size": 30, "mature": "false"},
                      headers=UA, timeout=40)
@@ -126,14 +166,4 @@ def candidates(query: str, used: list[str], rng: random.Random, pexels_key: str 
 
 
 def download(photo: StockPhoto, target: Path) -> Path | None:
-    try:
-        r = requests.get(photo.url, headers=UA, timeout=60)
-        r.raise_for_status()
-    except requests.RequestException as err:
-        log.warning("stock download failed: %s", err)
-        return None
-    if not r.headers.get("content-type", "").startswith("image/"):
-        return None
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_bytes(r.content)
-    return target
+    return download_file(photo.url, target, "image/")
